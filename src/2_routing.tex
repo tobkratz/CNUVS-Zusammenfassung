@@ -139,6 +139,7 @@
 		c(v,w) sind dann die Kosten der Kanten. Wenn eine Kante nicht in E ist, ist c unendlich. Das Ziel ist es dann den günstigsten Pfad von node s (source) zu node v zu finden. Hierfür wird meistens Dijkstras verwendet. Jeder Router versendet regelmäßig per flooding ''Link state packages'' mit Informationen, die er zu seinen Nachbarn gesammelt hat (delay, hop count...) und verseht diese mit einer sequence Number und einem ''age flag''. Wenn ein Router so ein Packet bekommt, das er jedoch schon kennt (sequence Number) oder es abgelaufen ist, wirft er es weg. 
 
 		\paragraph{Vergelich LSR und DVR}
+		Link State Routing und Distance Vecotr Routing im direkten Vergleich:
 		\begin{table}[h]
 			\resizebox{\textwidth}{!}{%
 			\begin{tabular}{|l|l|l|}
@@ -154,6 +155,17 @@
 			}
 		\end{table}
 
+		Algorithmen wie LSR und DVR sind für Netze konzipiert, die sich selten ändern und physikalisch verbunden sind. Sie haben vorallem Schwächen bei Mobilen Netzen, bei z.B. folgenden Punkten:
+
+		\begin{itemize}
+			\item \textbf{High dynamics} z.B. durch stendig wechselnde Nachbarn und Links
+			\item \textbf{Power conservation} regelmäßiges senden von Routing Packeten verbraucht Strom und Leistung
+			\item \textbf{Low bandwidth links} wenn z.B. Routing Informationen nicht versendet werden können
+			\item \textbf{Asymmetry} Links können in der Geschwindigkeit variieren
+			\item \textbf{Interference} Störsignale
+			\item \textbf{High redundancy} ein Gerät ist mit vielen anderen Verbunden / "meshed"
+		\end{itemize}
+
 	\subsection{Hierarchical Routing}
 		In der Realität sind große Netze nicht so ideal wie bisher beschrieben, sondern sind meist nicht flach wie wir sie beschrieben haben und Router unterscheiden sich oft fundamental. Im Internet heute gibt es über 1 Milliarde links, die alle zu erreichen würde Routing Tabellen explodieren lassen und der Austausch dieser Tabellen würde jeden Link sprengen. Deswegen ist das Internet in Teilnetze aufgeteilt: Autonomous Systems. 
 
@@ -164,14 +176,14 @@
 		\subsubsection{About BGB and Internet Routing}
 			Zum Vegleich die Routing Protokolle RIP \& OSPF:
 			\begin{itemize}
-				\item RIP
+				\item \textbf{RIP}
 				\begin{itemize}
 					\item DVR
 					\item Erstmal 1983 aufgetaucht. RFC 1058 von 1988
 					\item Am minimalen Hop-Count orientiert
 					\item Poison Reverse
 				\end{itemize}
-				\item OSPF
+				\item \textbf{OSPF}
 				\begin{itemize}
 					\item LSR
 					\item RFC 1131 (inzwischen Version 2 \& 3)
@@ -193,5 +205,46 @@
 
 				\paragraph{BGP Security}
 					In BGP stellt jeder AS selbst ein, welches Subnetz er verwaltet. Kommt es bei dem einstellen zu Fehlern ein AS announced ein Subnetz, welches er nicht wirklich organisiert, kommt es zu falschen Routen. So geschehen z.B. 24.02.2008 der Pakistan Telekom (AS17557). Eine generelle Einschätzung zu Routing Security siehe RFC4593. Mit BGP können aber auch Security Operations implementiert werden, z.B. durch setzen einer IP TTL von 255 und es werden nur Routing Informationen mit einer TTL >= 254 verarbeitet. Außerdem können BGP Session mit MD5 Signaturen versehen werden.
+	\subsection{Mobile Routing}
+		Mobile Networking ist gut geeignet, um ein schnelles Netzwerk an Orten ohne gut Infrastruktur aufzubauen. Anders als im Internet sind beim Mobile Routen ganz andere Probleme zu bewältigen. Da zwischen Host keine physikalische Verbidnung besteht ist, wird Routing zwischen Host schwierig. Doch durch sich wechselnde Positionen o.ä. verändern sich links zwischen Host sehr schnell. Das und andere sind Faktoren, mit denen DVR und LSR nicht umgehen können, diese sind für statische Netze konzipiert. Routing Algorithmen können in zwei Kategorien aufgeteilt werden:
+		\begin{itemize}
+			\item \textbf{Proaktiv}
+				\begin{itemize}
+					\item Routing Informationen werden unabhängig vom aktuellen Traffic regelmäßig und undabhängig generiert
+					\item Alle "Internet Routing Algorithmen" sind Proaktiv, auch die oben kennengelernten Beispiele
+					\item \item Beispiel für ein Reactive Mobile Routing Algorithmus: DSDV
+				\end{itemize}
+			\item \textbf{Reactive}
+				\begin{itemize}
+					\item Routen werden erst dann berechnet, wenn Daten übertragen werden sollen
+					\item Bei CO wird eine Route (wenn noch keine Vorhanden ist) beim connection Setup berechnet
+					\item Bei CL beim ersten Packet
+					\item Beispiel für ein Reactive Mobile Routing Algorithmus: DSR
+				\end{itemize}
+		\end{itemize}
 
-		\subsubsection{Mobile Routing}
+		\subsubsection{DSDV}
+			DSDV ist eine Erweiterung des DVR spezialisiert für Mobile Netze. Es gibt 2 große Extensions: 
+			\begin{enumerate}
+				\item Sequence Numbers for all Routing updates
+				\begin{itemize}
+					\item Verbesserungen gegen Schleifen und Inkonsistenzen
+				\end{itemize}
+				\item Decrease update frequency
+				\begin{itemize}
+					\item Zeit zwischen ersten und bestem announcemendd eines Pfades wird gespeichert
+				\end{itemize}
+			\end{enumerate}
+			Trotz dessen ist DSDV noch ein Proaktiver Algorithmus und ähnelt sehr stark dem DVR. 
+
+		\subsubsection{DSR}
+			DSR (RFC 4728) geht einen Schritt weiter Richtung Reaktivem Routing. Er baut auf zwei simplen Ideen auf: 
+			\begin{enumerate}
+				\item Routing wird ind "Path discovery" und "path maintenance" aufgeteilt
+				\item regelmäßiges Updaten wird vermieden
+			\end{enumerate}
+			Er ist für statische und dynamische Netze geeignet und kann mit bis zu 200 Knoten arbeiten. "Source Routing" bedeutet dabei, dass der Sender für die Bestimmung des Pfades verantwortlich ist.
+			\paragraph{Path Discovery}
+				Wenn ein Sender ein Packet versenden will, jedoch noch keine Route für das Ziel hat, startet er die Path Discovery. Es wird dabei ein Packet per flooding und boradcast mit der Ziel Addresse und einer einmaligen ID versendet. Wenn ein Host ein solches Packet erhält und er ist das Ziel, sendet er das Packet mit dem Pfad über das es gekommen ist zurück. Das erste Packet dass diesen Host erreicht kam über dem schnellsten Pfad, jedes weitere Packet kann dann verworfen werden. 
+				Es sind noch weitere Optimierungen möglich: 
+				%2:91

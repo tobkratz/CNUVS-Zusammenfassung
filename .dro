@@ -1,8 +1,0 @@
----
-kind: pipeline
-name: Test latex 
-steps:
-- name: build
-  image: vsund/latex-tuda-ci
-  commands:
-    - pdflatex main.tex

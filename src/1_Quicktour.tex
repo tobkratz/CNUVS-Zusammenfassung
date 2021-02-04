@@ -1,144 +1,144 @@
 \section{Quick Tour}
 %AUTHOR: Tobias Kratz
 \subsection{Making two devices communicate}
-    %Folie 1:8
-    Verschiedene Möglichkeiten, um Kommunitkation herzustellen: direkte physische Verbindung. Hier werden Daten als Bits übertragen. Eine 1 könnte als als steigende Taktflanke und eine 0 als fallende dargestellt werden, es gibt jedoch viele Probleme bei der Implementation (00, 11, wechselnde Taktfrequenz...).
-    \paragraph{low level properties of communication}
-        Es gibt verschiedene Werte, die bei low-level communication wichtig sind: 
-        \begin{itemize}
-            \item Delay (Latenz) d = distance / Propagation speed v. (v ist im vakuum = c, in Kupfer etwa $\frac{2}{3}$ c)
-            \item Data rate r (Datenrate) = Data size/ data rate (Bsp. bits/secound). \\ Wichtig ist hier, dass nicht die Geschwindigkeit gemeint ist, mit der die Daten Transportiert werden (siehe v), sondern in welcher rate die Bits auf die Leitung gelegt werden.
-        \end{itemize}
-        
-        Wenn der Sender eine Daten sendet, werden diese nicht auf Sender Seite gespeichert, sonder lediglich beim Empfänger. Allerhöchstens sind die Daten während der Übertragung im Kabel gespeichert. \\
-        Beispeil Latexberechnung (delay \& data rate): Wir senden 1250 Bytes ($10^4b$) über 6 Meter mit einer Geschwindigkeit von 10 Mbps ($10^7 \frac{b}{s}$). Der Delay $d$ beträgt dabei $d = \frac{6m}{c} = \frac{6m}{3\cdot 1-^8\frac{m}{s}} = 2\cdot1-^{-8}s = 20ns$. Die Data rate beträgt $r= \frac{10^4b}{10^7\frac{b}{s}} = 10^{-3}s = 1ms$. 
-    \paragraph{Types of physical communication}
-        Die Typen lassen sich in 3 Fälle aufteilen:
-        \begin{itemize}
-            \item Simplex: Eine Seite kann nur senden, die andere nur Empfangen (one-way). Empfänger lassen sich jedoch beliebig skalieren.
-            \item Half Duplex: Beide Seiten wechseln sich ab mit senden um Empfangen (vgl. Telefonat/Gesrpäch).
-            \item Duplex: Beide Seiten können senden wie und wann sie lustig sind (vgl. Streitgesrpäch).
-        \end{itemize}
-        Während Simplex und Half Duplex einfach realisierbar sind, ist (Full) Duplex eine technische Herausforderung. 
-        \paragraph{Realizing Half Duplex}
-        Denkbar wären 2 Kabel, eins je Host, das wäre jedoch eine Verschwendung, da diese Kabel nie Zeitgleich genutzt werden würden. Es gibt zwei Ansätze: Time divison duplex (TDD) und on-dmand duplex. Beim TDD hat jeder Host eine feste Zeit T zum senden, und es wird zwangsläufig abgewechselt. Beim on-demand duplex gibt jeder Host die Länge der nächsten Bit Sequenz am Anfang direkt bekannt (pre-announce). 
-    \paragraph{Realizing Full Duplex}
-        Hier wären 2 Kabel eher anwendbar, bedeuten aber den doppelten Aufwand. Auf kurzer Distanz kann jedoch auch Full Duplex mit einem Kabel realisiert werden, in dem Jeder Host eine leicht andere Frequenz benutzt (z.B. bei WiFi). Auch TDD ist umsetzbar. Während A sendet, speicher B die zu sendenden Daten. Nach T sendet B dann den Stack während A speichert. Das ist jedoch nicht Analog umsetzbar, da z.B. Sprachdaten sich nicht in Portionen aufteilen lassen. 
+	%Folie 1:8
+	Verschiedene Möglichkeiten, um Kommunitkation herzustellen: direkte physische Verbindung. Hier werden Daten als Bits übertragen. Eine 1 könnte als als steigende Taktflanke und eine 0 als fallende dargestellt werden, es gibt jedoch viele Probleme bei der Implementation (00, 11, wechselnde Taktfrequenz...).
+	\paragraph{low level properties of communication}
+		Es gibt verschiedene Werte, die bei low-level communication wichtig sind: 
+		\begin{itemize}
+			\item Delay (Latenz) d = distance / Propagation speed v. (v ist im vakuum = c, in Kupfer etwa $\frac{2}{3}$ c)
+			\item Data rate r (Datenrate) = Data size/ data rate (Bsp. bits/secound). \\ Wichtig ist hier, dass nicht die Geschwindigkeit gemeint ist, mit der die Daten Transportiert werden (siehe v), sondern in welcher rate die Bits auf die Leitung gelegt werden.
+		\end{itemize}
+		
+		Wenn der Sender eine Daten sendet, werden diese nicht auf Sender Seite gespeichert, sonder lediglich beim Empfänger. Allerhöchstens sind die Daten während der Übertragung im Kabel gespeichert. \\
+		Beispeil Latexberechnung (delay \& data rate): Wir senden 1250 Bytes ($10^4b$) über 6 Meter mit einer Geschwindigkeit von 10 Mbps ($10^7 \frac{b}{s}$). Der Delay $d$ beträgt dabei $d = \frac{6m}{c} = \frac{6m}{3\cdot 1-^8\frac{m}{s}} = 2\cdot1-^{-8}s = 20ns$. Die Data rate beträgt $r= \frac{10^4b}{10^7\frac{b}{s}} = 10^{-3}s = 1ms$. 
+	\paragraph{Types of physical communication}
+		Die Typen lassen sich in 3 Fälle aufteilen:
+		\begin{itemize}
+			\item Simplex: Eine Seite kann nur senden, die andere nur Empfangen (one-way). Empfänger lassen sich jedoch beliebig skalieren.
+			\item Half Duplex: Beide Seiten wechseln sich ab mit senden um Empfangen (vgl. Telefonat/Gesrpäch).
+			\item Duplex: Beide Seiten können senden wie und wann sie lustig sind (vgl. Streitgesrpäch).
+		\end{itemize}
+		Während Simplex und Half Duplex einfach realisierbar sind, ist (Full) Duplex eine technische Herausforderung. 
+		\paragraph{Realizing Half Duplex}
+		Denkbar wären 2 Kabel, eins je Host, das wäre jedoch eine Verschwendung, da diese Kabel nie Zeitgleich genutzt werden würden. Es gibt zwei Ansätze: Time divison duplex (TDD) und on-dmand duplex. Beim TDD hat jeder Host eine feste Zeit T zum senden, und es wird zwangsläufig abgewechselt. Beim on-demand duplex gibt jeder Host die Länge der nächsten Bit Sequenz am Anfang direkt bekannt (pre-announce). 
+	\paragraph{Realizing Full Duplex}
+		Hier wären 2 Kabel eher anwendbar, bedeuten aber den doppelten Aufwand. Auf kurzer Distanz kann jedoch auch Full Duplex mit einem Kabel realisiert werden, in dem Jeder Host eine leicht andere Frequenz benutzt (z.B. bei WiFi). Auch TDD ist umsetzbar. Während A sendet, speicher B die zu sendenden Daten. Nach T sendet B dann den Stack während A speichert. Das ist jedoch nicht Analog umsetzbar, da z.B. Sprachdaten sich nicht in Portionen aufteilen lassen. 
 
 \subsection{Connecting many computers}
-    %Folie 1:20
-    Jeden Computer direkt mit jedem anderen zu verbinden wäre zwar möglich, skaliert jedoch eher so semi (https://www.reddit.com/r/cablegore/top/?t=all). Switches wäre eine Lösung, jedoch laufen dann mehrere Connections über ein Kabel, es kommt also zu Einbußung in der Data Rate. Außerdem besteht das Problem, wie man eine Connection über einen switch herstellt (vgl. Vermittlung beim Telefon). Das führt jedoch dazu, dass eine Connection nur einfach genutzt werden kann, ist ein Host also mit einem anderen verbunden, kann ein Host nicht mehr erreicht werden. 
-    \paragraph{Packet switching}
-        Statt also ein Circut für eine Verbindung zu blocken, teilt der switch die Daten in packete und sendet diese. So wird die Leitung nur für die Länge eines Packets geblockt und es kann schneller gewechselt werden. \\
-        Probleme: Anfang und Ende bestimmen? Wie bestimmt man wo das Packet hin soll? \\ Beispiel Ablauf: \frQuo store-and-forward\frQuc switching: 
-        \begin{enumerate}
-            \item recieve a complete packet
-            \item store the packet in a Buffer
-            \item Find out the packet's destination
-            \item decide where the packet should be sent next (benötigt Kenntnis über Netzwerk Topologie)
-            \item forward the packet to his next hop of its journey
-        \end{enumerate}
-    \paragraph{Multiplexing}
-        \begin{quote}
-            \frQuo Organziging the forwarding of packets over such a single, shared connection is called multiplexing.\frQuc
-        \end{quote}
-        Auch beim Multiplexing ist TDM (Time Division Multiplexing) (nur ein Packet gleichzeitig) und FDM (Frequenz Division Multiplexing) (mehrere Packete auf gleichzeitig auf unterschiedlichen Frequenzen) möglich. Bei optischen Verbindungen WDM (wavelength division multiplexing) statt FDM. 
-        Es gibt jedoch noch weitere Formen, die hauptsächlich für Wireless transmission geeignet sind: CDM (Code Divison Multiplexing) und SDM (Space Division Multiplexing). \\
-        %TODO SDM und CDM recherchieren
-        Multiplexing lässt sich auch abstrahieren, wenn zum Beispiel mehrere connections eines höhrer Layers eine lower-level connection nutzen sollen (s.c. upward multiplexing). Allgemein lässt sich in dem Kontext von shared Recources sprechen.
+	%Folie 1:20
+	Jeden Computer direkt mit jedem anderen zu verbinden wäre zwar möglich, skaliert jedoch eher so semi (https://www.reddit.com/r/cablegore/top/?t=all). Switches wäre eine Lösung, jedoch laufen dann mehrere Connections über ein Kabel, es kommt also zu Einbußung in der Data Rate. Außerdem besteht das Problem, wie man eine Connection über einen switch herstellt (vgl. Vermittlung beim Telefon). Das führt jedoch dazu, dass eine Connection nur einfach genutzt werden kann, ist ein Host also mit einem anderen verbunden, kann ein Host nicht mehr erreicht werden. 
+	\paragraph{Packet switching}
+		Statt also ein Circut für eine Verbindung zu blocken, teilt der switch die Daten in packete und sendet diese. So wird die Leitung nur für die Länge eines Packets geblockt und es kann schneller gewechselt werden. \\
+		Probleme: Anfang und Ende bestimmen? Wie bestimmt man wo das Packet hin soll? \\ Beispiel Ablauf: \frQuo store-and-forward\frQuc switching: 
+		\begin{enumerate}
+			\item recieve a complete packet
+			\item store the packet in a Buffer
+			\item Find out the packet's destination
+			\item decide where the packet should be sent next (benötigt Kenntnis über Netzwerk Topologie)
+			\item forward the packet to his next hop of its journey
+		\end{enumerate}
+	\paragraph{Multiplexing}
+		\begin{quote}
+			\frQuo Organziging the forwarding of packets over such a single, shared connection is called multiplexing.\frQuc
+		\end{quote}
+		Auch beim Multiplexing ist TDM (Time Division Multiplexing) (nur ein Packet gleichzeitig) und FDM (Frequenz Division Multiplexing) (mehrere Packete auf gleichzeitig auf unterschiedlichen Frequenzen) möglich. Bei optischen Verbindungen WDM (wavelength division multiplexing) statt FDM. 
+		Es gibt jedoch noch weitere Formen, die hauptsächlich für Wireless transmission geeignet sind: CDM (Code Divison Multiplexing) und SDM (Space Division Multiplexing). \\
+		%TODO SDM und CDM recherchieren
+		Multiplexing lässt sich auch abstrahieren, wenn zum Beispiel mehrere connections eines höhrer Layers eine lower-level connection nutzen sollen (s.c. upward multiplexing). Allgemein lässt sich in dem Kontext von shared Recources sprechen.
 
-    \paragraph{Forwarding and next hop selection}
-        Bekanntes Problem: Wie weiß eine Host/router/switch, wo er Packete hinschicken soll? Wie kennt er die besste/schnellste Verbindung? Es gibt einfache Ansätze:
-        \begin{itemize}
-            \item Flooding: alle Packete an alle Nachbarn senden
-            \item Hot-potato routing: So schnell wie möglich an einen/mehrere zufällige Nachbarn senden
-        \end{itemize}
-        Sinnvoller wäre jedoch, wenn sich der router die besten wege merkt, e.g. durch Routing Tabellen. Diese können durch 2 Arten gesammelt werden: aktiv und passiv. \\
-        Passiv: Aktiv traffic beobachten und daraus Schlüsse ziehen. \\
-        Aktiv: Informationen aktiv senden und empfangen unter den verschiedenen Routern (routing protocols). \\
-        Jedoch bei Netzen der größe unsere Internets können Routing Tabellen schnell sehr groß werden. Hier kann man das Netz in mehrere Teilnetze splitten (devide et impera). 
-        
-    \subsection{Organizing the mess - and connecting 'Alien' computers}
-        Der Schlüssel ist \frQuo Simplification by abstraction\frQuc. \\
-        Z.B. das Modell des DS (distributed Systems) hilft beim verstehen von CN (computer networks). ein DS besteht aus AS (autonomous systems) und CSS (communication subsystems). Oft referiert wird auch auf die Abstraktion des OSI (Open Systems Interconnection) Schichten Modell.
-        \subsubsection{OSI}
-            \paragraph{Part 1: Concepts and Terms}
-                \begin{quote}
-                    \frQuo A protocol defines the format and the order of messages exhanged between two or more communicating entities, as well as the actions taken on transmission and/or reception of a message or other event\frQuc
-                \end{quote}
-                Analog zum 'Computer' Protokoll kann man sich ein menschliches Protokoll vorstellen, z.B. der definierte Ablauf beim Telefonieren (Hallo, Hallo..... Tschüß, Tschau).
-                Weiter ist das OSI Modell in schichten aufgeteilt. Analog wäre z.B. Layer 2 ein Manager, der einen Brief in Auftrag gibt (Layer 1), der dann von der Post (Layer 0) transportiert wird. Ein layer N hat bietet also services für den layer n+1 an. Zwei layer n kommunizieren nur mit den für diesen layer vorgesehenden Protokolle, diese können jedoch auf services von layer n-1 zugreifen (der unterste layer kann natürlich nur eigene services nutzen). \\
-                Services im OSI Modell lassen sich in 2 Gruppen aufteilen:
-                \begin{itemize}
-                    \item \textbf{connection-orientated services:}
-                        Diese haben meist 3 Phasen: 
-                        \begin{itemize}
-                            \item CON (Connection Establishment)
-                            \item DAT (Data Exchange)
-                            \item DIS (Disconnect)
-                        \end{itemize}
-                    \item \textbf{connectionless services:}
-                        Bei diesen fallen CON und DIS weg und es werden nur Daten Ausgetauscht. 
-                \end{itemize}
-                Im Osi Modell werden Nachrichten höhrer Layer als Daten Einheiten (Data Units) tierfer Layer transportiert. Hierfür gibt es einigen common Notations: 
-                \begin{itemize}
-                    \item packet: Ist die Einheit, die Transportiert wird (kann aus Fragmenten bestehen)
-                    \item datagram: wird bei connectionsless services als ersatz für Packete verwendet
-                    \item frame: 'fertig und verpackt' um versendet zu werden.
-                    \item cell: kleinere packet mit einer definierten größe
-                    \item PDU (Protocol Data Unit): eine (N)-PDU ist definiert durch: (N)-PCI+(N)-SDU
-                    \item PCI (Protocol Control Information): wird nur von peers genuzt.
-                    \item SDU (Service Data Unit): Ist die zu versendete payload eines höheren layers. (N)SDU=(N+1)-PCI+(N+1)-SDU
-                \end{itemize}
-            \paragraph{Part 2: 7 Layer Model}
-                \paragraph{Layer 1: physical Layer (PH)}
-                    Senden von Bits durch (de-)aktivieren von Signalen auf Leitungen. \\
-                    Beispiel: 1000 Base-T
-                
-                \paragraph{Layer 2: data link layer (D)}
-                    Sendet Packete als Frames um Fehler zu erkennen und zu beheben, um Fehleranfällige Hosts zu schützen. Kann auch Flow Controll verwenden, um langsame Hosts zu schützen. \\
-                    Beispiel: Ethernet
-                
-                \paragraph{Layer 3: network layer (N)}
-                    Ziel ist es den Packet-Stream zwischen zwei Hosts zu ermöglichen. Koordinierung der Pfade von Host zu Host. Konkret: Routing Wege finden und Packete weiterleiten und Fehler beheben, z.B. durch 'flow controll'. Up- und downward multiplexing ist möglich. Außerdem kann congestion control auf diesem layer angewendet werden.\\
-                    Beispiel: IP
-                \paragraph{Layer 4: transport layer (T)}
-                    Logische Verbindungen zwischen zwei Prozessen (nicht nur zwischen zwei Computern), Fehlerkorrektur und Paketzusammensetzung für den N-Layer. \\
-                    Beispiel: TCP
-                
-                \paragraph{Layer 5: session layer (S)}
-                    Koordiniert Session z.B. bei HTTP mit dem Session-Cookies und hilft Nutzer und Anwendung bei der Konstruktion und dem spannen von aufeinanderfolgenden Verbindungen. \\
-                    Beispiel: HTTPS
-                
-                \paragraph{Layer 6: presentation layer (P)}
-                    Sellt die Daten in eine unabhängige Form um, um unahängig davon die Übermittlung - gg. mit Kompression und Verschlüsslung - zu ermöglichen. \\
-                    Beispiel: LDAP
-                
-                \paragraph{Layer 7: application layer (A)}
-                    Stellt Funktionen wie Daten Ein- und Ausgabe zur Verfügung. \\
-                    Beispiel: XMPP
-        \subsubsection{5 Layer of the Internet}
-            Im Internet verschmelzen Layer 5,6,7 oft und oft sind die übergänge nicht klar definiert. 
-            \paragraph{Layer 1}
-               übermittlung von frames als stream von bits
-            
-            \paragraph{Layer 2}
-                Daten von layer 3 in Frames verpacken und and direkte Nachbarn weiterleiten
-            
-            \paragraph{Layer 3}
-                Daten vom client zum web-server weiterleiten, router2router communication, außerdem können e2e Verbindungen durch hop-to-hop realisiert werden
-            \paragraph{Layer 4}
-                Verlässliche Verbindung zum Web-server herstellen und sicherstellen, dass die Daten auch in der richtigen Reihenfolge ankommen, jedoch keine congestion control. 
-            
-            \paragraph{Layer 5,6,7}
-                HTTP Anfragen erstellen, Ebene 4 aufrufen (TCP). 
-            
-        \subsubsection{network types}
-            Wie schon erwähnt gibt es CO und CL networks. Beispiel für CO ist z.B. Das Telefon, CL die Post. CO haben durch die durch Handshakes vorallem bei kurzen Verbindungen eine Hohe 'extra Last' durch die zusätzlichen Daten des Handshakes, lassen sich jedoch besser skalieren, da sie nicht einen Status gebunden sind (stateless). CO sind jedoch durch den Status der connection Zuverlässiger. Bei einem 'verstopften' Network können mit CL immernoch Daten versendet werden, es kann nur sein, dass diese verspätet ankommen, CO haben jedoch schwierigkeiten. Es ist möglich CO auf CL aufzubauen.
-            \paragraph{connection-oriented Networks}
-                Im CO network ist der erste Schritt mit einem handshake eine connection herzustellen. Nach dem handshake wissen beide Seiten von der connection und der Datenaustausch kann stattfinden. Die connection ist dabei nur ein loser status, auf dem Basis jedoch andere Eigentschaften (flow control, congestion control...) aufgebaut werden können. \\ 
-                Bei CO networks implementiert nicht direkt andere Eigentschaften der Verbindung. Dinge wie reliability, flow control und congestion control sind für CO networks sind nicht notwendig. Diese können z.B. mit TCP ermöglicht werden.
-            \paragraph{connectionless networks}
-                keine handshakes, direkt Faken (Daten Austausch). Wenn der Datenaustausch vorbei ist, kommt auch kein DIS mehr. CL networks brauchen wenig Aufwand, da keine connection gepflegt werden muss, es kann jedoch sein, dass der reciever nicht bereit zum Empfangen ist. CL implementieren keine reliability, flow control und congestion control. 
-            
-            
+	\paragraph{Forwarding and next hop selection}
+		Bekanntes Problem: Wie weiß eine Host/router/switch, wo er Packete hinschicken soll? Wie kennt er die besste/schnellste Verbindung? Es gibt einfache Ansätze:
+		\begin{itemize}
+			\item Flooding: alle Packete an alle Nachbarn senden
+			\item Hot-potato routing: So schnell wie möglich an einen/mehrere zufällige Nachbarn senden
+		\end{itemize}
+		Sinnvoller wäre jedoch, wenn sich der router die besten wege merkt, e.g. durch Routing Tabellen. Diese können durch 2 Arten gesammelt werden: aktiv und passiv. \\
+		Passiv: Aktiv traffic beobachten und daraus Schlüsse ziehen. \\
+		Aktiv: Informationen aktiv senden und empfangen unter den verschiedenen Routern (routing protocols). \\
+		Jedoch bei Netzen der größe unsere Internets können Routing Tabellen schnell sehr groß werden. Hier kann man das Netz in mehrere Teilnetze splitten (devide et impera). 
+		
+	\subsection{Organizing the mess - and connecting 'Alien' computers}
+		Der Schlüssel ist \frQuo Simplification by abstraction\frQuc. \\
+		Z.B. das Modell des DS (distributed Systems) hilft beim verstehen von CN (computer networks). ein DS besteht aus AS (autonomous systems) und CSS (communication subsystems). Oft referiert wird auch auf die Abstraktion des OSI (Open Systems Interconnection) Schichten Modell.
+		\subsubsection{OSI}
+			\paragraph{Part 1: Concepts and Terms}
+				\begin{quote}
+					\frQuo A protocol defines the format and the order of messages exhanged between two or more communicating entities, as well as the actions taken on transmission and/or reception of a message or other event\frQuc
+				\end{quote}
+				Analog zum 'Computer' Protokoll kann man sich ein menschliches Protokoll vorstellen, z.B. der definierte Ablauf beim Telefonieren (Hallo, Hallo..... Tschüß, Tschau).
+				Weiter ist das OSI Modell in schichten aufgeteilt. Analog wäre z.B. Layer 2 ein Manager, der einen Brief in Auftrag gibt (Layer 1), der dann von der Post (Layer 0) transportiert wird. Ein layer N hat bietet also services für den layer n+1 an. Zwei layer n kommunizieren nur mit den für diesen layer vorgesehenden Protokolle, diese können jedoch auf services von layer n-1 zugreifen (der unterste layer kann natürlich nur eigene services nutzen). \\
+				Services im OSI Modell lassen sich in 2 Gruppen aufteilen:
+				\begin{itemize}
+					\item \textbf{connection-orientated services:}
+						Diese haben meist 3 Phasen: 
+						\begin{itemize}
+							\item CON (Connection Establishment)
+							\item DAT (Data Exchange)
+							\item DIS (Disconnect)
+						\end{itemize}
+					\item \textbf{connectionless services:}
+						Bei diesen fallen CON und DIS weg und es werden nur Daten Ausgetauscht. 
+				\end{itemize}
+				Im Osi Modell werden Nachrichten höhrer Layer als Daten Einheiten (Data Units) tierfer Layer transportiert. Hierfür gibt es einigen common Notations: 
+				\begin{itemize}
+					\item packet: Ist die Einheit, die Transportiert wird (kann aus Fragmenten bestehen)
+					\item datagram: wird bei connectionsless services als ersatz für Packete verwendet
+					\item frame: 'fertig und verpackt' um versendet zu werden.
+					\item cell: kleinere packet mit einer definierten größe
+					\item PDU (Protocol Data Unit): eine (N)-PDU ist definiert durch: (N)-PCI+(N)-SDU
+					\item PCI (Protocol Control Information): wird nur von peers genuzt.
+					\item SDU (Service Data Unit): Ist die zu versendete payload eines höheren layers. (N)SDU=(N+1)-PCI+(N+1)-SDU
+				\end{itemize}
+			\paragraph{Part 2: 7 Layer Model}
+				\paragraph{Layer 1: physical Layer (PH)}
+					Senden von Bits durch (de-)aktivieren von Signalen auf Leitungen. \\
+					Beispiel: 1000 Base-T
+				
+				\paragraph{Layer 2: data link layer (D)}
+					Sendet Packete als Frames um Fehler zu erkennen und zu beheben, um Fehleranfällige Hosts zu schützen. Kann auch Flow Controll verwenden, um langsame Hosts zu schützen. \\
+					Beispiel: Ethernet
+				
+				\paragraph{Layer 3: network layer (N)}
+					Ziel ist es den Packet-Stream zwischen zwei Hosts zu ermöglichen. Koordinierung der Pfade von Host zu Host. Konkret: Routing Wege finden und Packete weiterleiten und Fehler beheben, z.B. durch 'flow controll'. Up- und downward multiplexing ist möglich. Außerdem kann congestion control auf diesem layer angewendet werden.\\
+					Beispiel: IP
+				\paragraph{Layer 4: transport layer (T)}
+					Logische Verbindungen zwischen zwei Prozessen (nicht nur zwischen zwei Computern), Fehlerkorrektur und Paketzusammensetzung für den N-Layer. \\
+					Beispiel: TCP
+				
+				\paragraph{Layer 5: session layer (S)}
+					Koordiniert Session z.B. bei HTTP mit dem Session-Cookies und hilft Nutzer und Anwendung bei der Konstruktion und dem spannen von aufeinanderfolgenden Verbindungen. \\
+					Beispiel: HTTPS
+				
+				\paragraph{Layer 6: presentation layer (P)}
+					Sellt die Daten in eine unabhängige Form um, um unahängig davon die Übermittlung - gg. mit Kompression und Verschlüsslung - zu ermöglichen. \\
+					Beispiel: LDAP
+				
+				\paragraph{Layer 7: application layer (A)}
+					Stellt Funktionen wie Daten Ein- und Ausgabe zur Verfügung. \\
+					Beispiel: XMPP
+		\subsubsection{5 Layer of the Internet}
+			Im Internet verschmelzen Layer 5,6,7 oft und oft sind die übergänge nicht klar definiert. 
+			\paragraph{Layer 1}
+			   übermittlung von frames als stream von bits
+			
+			\paragraph{Layer 2}
+				Daten von layer 3 in Frames verpacken und and direkte Nachbarn weiterleiten
+			
+			\paragraph{Layer 3}
+				Daten vom client zum web-server weiterleiten, router2router communication, außerdem können e2e Verbindungen durch hop-to-hop realisiert werden
+			\paragraph{Layer 4}
+				Verlässliche Verbindung zum Web-server herstellen und sicherstellen, dass die Daten auch in der richtigen Reihenfolge ankommen, jedoch keine congestion control. 
+			
+			\paragraph{Layer 5,6,7}
+				HTTP Anfragen erstellen, Ebene 4 aufrufen (TCP). 
+			
+		\subsubsection{network types}
+			Wie schon erwähnt gibt es CO und CL networks. Beispiel für CO ist z.B. Das Telefon, CL die Post. CO haben durch die durch Handshakes vorallem bei kurzen Verbindungen eine Hohe 'extra Last' durch die zusätzlichen Daten des Handshakes, lassen sich jedoch besser skalieren, da sie nicht einen Status gebunden sind (stateless). CO sind jedoch durch den Status der connection Zuverlässiger. Bei einem 'verstopften' Network können mit CL immernoch Daten versendet werden, es kann nur sein, dass diese verspätet ankommen, CO haben jedoch schwierigkeiten. Es ist möglich CO auf CL aufzubauen.
+			\paragraph{connection-oriented Networks}
+				Im CO network ist der erste Schritt mit einem handshake eine connection herzustellen. Nach dem handshake wissen beide Seiten von der connection und der Datenaustausch kann stattfinden. Die connection ist dabei nur ein loser status, auf dem Basis jedoch andere Eigentschaften (flow control, congestion control...) aufgebaut werden können. \\ 
+				Bei CO networks implementiert nicht direkt andere Eigentschaften der Verbindung. Dinge wie reliability, flow control und congestion control sind für CO networks sind nicht notwendig. Diese können z.B. mit TCP ermöglicht werden.
+			\paragraph{connectionless networks}
+				keine handshakes, direkt Faken (Daten Austausch). Wenn der Datenaustausch vorbei ist, kommt auch kein DIS mehr. CL networks brauchen wenig Aufwand, da keine connection gepflegt werden muss, es kann jedoch sein, dass der reciever nicht bereit zum Empfangen ist. CL implementieren keine reliability, flow control und congestion control. 
+			
+			

@@ -1,91 +1,197 @@
 \section{Routing} % http://www.unterhaltungsspiele.com/Geschichten/erlkoenig.html
-    %AUTHOR: Tobias Kratz
-    \subsection{introduction}
-        Im Routing werden dafür gesort, dass Packete vom Empfänger an das richtige Ziehl kommen. Bei Direkt Verbindungen besteht das Problem nicht, jedoch ist das bei großen Netzwerk keine Option, wenn jeder Host mit jedem anderem Verbunden werden muss. Wenn Switches genutzt werden, muss diesen jedoch gesagt werden, wie das Netzwerk aufgebaut ist (Netzwerk Topologie). In diesem Kapitel geht es um das Problem, wie ein Host den besten Weg zu einem Ziehl findet. 
-        
-        \paragraph{Building a large network}
-            Bei großen Netzwerken ist flooding und Hot-potato routing keine Option, da mit jedem Host die Anzahl an Packeten steigt und so mit den beiden Routing uneffizienten Methoden das Netzwerk schnell an sein Limit kommt. Ziel ist es eine Effiziente Methode zu finden, die Packete möglichst schnell ans Ziel bringt, ohne dabei unnötig viel Traffci erzeugt. \\
-            Im folgenden werden zwei Begriffe genutzt:
-            \begin{itemize}
-                \item \textbf{Routing:} determine route taken by packets from source to destination. (Basis: Routing algorithms). 
-                \item \textbf{Forwarding:} move packets from router's input to appropriate router output. 
-            \end{itemize}
-            
-        \subsubsection{Forwarding}
-            Wenn Packete von einem Netzwerk in ein anderes Netzwerk geileitet werden sollen, wird ein router eingesetzt. (Heute haben uns bekannte Router mehrere Aufgaben, die früher von verschiedenen Geräten übernommen wurden: hub, bridge, switch, gateway.) Wenn also Packete von einem Netzwerk in ein anderes gesendet werden sollen, übernimmt der Router die Koordination und leitet das Packet (forwarded) in das entsprechende Ziel Netzwerk. Hängt das andere Netzwerk direkt am selben Router, handelt sich sich um ein single hop. Wenn mindestens 2 Router zwischen den Netzwerken sind, handelt es sich um ein Multi-Hop.
-                
-        \subsubsection{Routing}
-            Routing findet für gewöhnlich auf Layer 3 statt, dort ist das Ziel Packete von Host A zu Host B möglichst effizient zu transportieren bzw. erstmal einen Pfad zu finden, auf dem das möglich ist. Dies wird i.d.R. von Routing Algorithmen durchgeführt. Das Internet besteht aus mehreren AS, die alle wieder aus Teilnetzen bestehen. Jedes AS führt dabei selbst routing Algorithmen aus, um die besten Wege zu finden. 
-            \begin{itemize}
-                \item CONS (CO+NS)
-                    Nn CO Networks Routing Algorithmen werden meist in der CON Phase durchgeführt. Im COTS (CO+TS) wissen nur die Endsysteme, dass sie verbunden sind, in CONS hingegen wissen alle Systeme auf der Route, dass die Systeme verbunden sind.
-                \item CLNS (CL+NS)
-                    IN CL Networks wird nicht bei jedem Packet der Algorithmus durchgeführt, das würde einen zu großen Overload bedeuten. Manchmal wird beim ersten Packet einer Verbidnung der Algorithmus durchgeführt, das ist allerdings für sich schnell änderte Netzwerke keine Option. Im Inetnet z.B. dies in regelmäßigen Abständen, oder wenn sich große Teile ändern.
-            \end{itemize}
-            
-        \paragraph{optimizing Routing Algorithmen}
-            Routing Algorithmen haben oft unterschiedliche Kriterien, nach denen sie arbeiten:
-            \begin{itemize}
-                \item Average packet delay
-                \item Total throughput
-                \item individual delay (kann jedoch mit anderen Kriterien im Widerspruch stehen)
-            \end{itemize}
-            Am meisten jedoch wird nach dem Kriterium, des minimal-hop-count gearbeitet, da dieser oft einen Kompromiss aus allen Kriterien bedeutet, es gibt jedoch keine Garantie dafür. 
-    
-    \subsection{Routing Algorithms}
-    %Folie 2:14
-        Routing Algorithmen werden meist in zwei Arten aufgeteilt:
-        \begin{itemize}
-            \item \textbf{Non-adaptive Routing Algorithms} \\
-                Diese agieren unabhängig vom State des Netzwerks. Beispiele sind flooding oder preconfiguration. 
-            \item \textbf{Adaptive Routing Algorithms} \\
-                Nehmen den aktuellen Status des Netzwerks mit in Betracht, wenn sie Routing Entscheidung treffen. Beispiel Hierfür wären distance-vector-routing oder link state routing. Das Problem hierbei ist, dass bei sich ändernden Neztwerken die Routen häufig neu entschieden werden. Algorithmen diesen Types sind trotzdem sinnvoll in eignen, fest bekannten Netzen. Bekommt ein Link z.B. so viel Traffic, das Packete verloren gehen, wird der Link als Broken makiert und es kommt zu noch größeren Ausfällen. \\
-                Es gibt dort auch 3 Unterarten: 
-                \begin{itemize}
-                    \item Centralized adaptive routing
-                    \item Isolated (aka. local) adaptive routing
-                    \item Distributed adaptive routing
-                \end{itemize}
-        \end{itemize}
-        
-        \subsubsection{Examples}
-            \paragraph{Flooding}
-                (non-adaptive) Hier wird jedes einkommende Packet an alle bekannten Nachbarn weiterleitet. Das Problem dabei ist, dass so Nezte schnell überlastet werden. Gibt es zum Beispiel schleifen, kann es schnell zu einer Flut an nicht aufhörenden Packeten kommen. Eine Lösung für dieses Problem wäre z.B. das implementieren von TTL (Time to live) oder Sequence Number. TTL werden meist in Hops angegeben und werden bei jedem Hop um 1 dekrementiert. Hat ein Packet ein TTL von 0, wird es weggeworfen. Eine Sequence Number wird beim ersten Router initialisiert. Jeder Router führt eine Tabelle mit Sequence Numbers, die er schon einmal geroutet hat. Kommt ein Packet mit einer Sequence Number, die er schon kennt, wird dieses Packet weggeworfen. \\
-                Flooding macht jedoch durchaus Sinn in sich schnell ändernden Netzen, z.B. bei WLAN oder Mobilfunk oder wenn alle Packete Multicast sind und so wie so mehrere Ziele haben. 
-            
-            \paragraph{Static Routes}
-                (non-adaptive)Static Routes sind großartig für statische, vorhersehbare Umgebungen. Das Problem ist, dass sich das Internet regelmäßig ändert und statische routen dann viel Wartungsaufwand bedeuten. 
-            
-            \paragraph{Centralized Adaptive Routing}
-                (adaptive) Es gibt einen Zentralen Control Center (RCC), der regelmäßig Informationen über die Topologie von allen Routern bekommt und dann einen Idealen Routing Graph erzeugt (z.B. Dijkstra). Das Problem hierbei ist, dass das Netz zusammenbricht, wenn nur der RCC ausfällt. Außerdem werden Routen 'in der Nähe' des RCC bevorzugt, was dort zu einer hohen Last führt während 'abgelegene' Router meist wenig Aufgaben haben. Ebenso bekommen Router die näher am RCC sind schneller die neuen Routing Informationen, was zu unterschiedlichen States führen kann.
-                
-            \paragraph{Isolated (aka. local) adaptive Routing}
-                (non-adaptive) Es werden Entscheidungen über Routen nur lokal getroffen. Beispiele sind Hot potato Routing und Backward learning. 
-                \begin{itemize}
-                    \item Hot Potato Routing \\
-                        Idee ist es, die Packete so schnell wie möglich loszuwerden, wobei nicht beachtet werden muss, zu welchen Host die Packete geschickt werden. Dieser Algorithmus ist nicht sehr effektiv, es gibt jedoch einige use-Cases in denen diese Art noch genutzt wird (peering/discovering).
-                    \item Backward Learning Routing \\
-                        Bei diesem Algorithmus werden im Packet Header Source Addresse und Hop Counter hinzugefügt, Router lernen also im laufenden Betrief über die Topologie und passen die Routen im Betrieb an. Jedoch müssen in jungen Netzwerken andere Algorithmen genuztzt werden (z.B. hot potato / flooding). Wenn der Hop-Count == 1 ist, kommt das Packet von einem direkten Nachbarn. Bei einem Hop-Count n>1 ist die source n hops away. 
-                \end{itemize}
-            
-            \paragraph{Distributed Adaptive Routing}
-                Durch Graph Abstraction die besten Routen finden. Knoten sind dabei Router und Kanten die physikalischen Links a.k.a. hops. Die Kosten eines links sind dabei z.B. delay, \$, oder der congestion Layer. Die Kosten eines Pfades sind dann alle link Kosten vereint. Ein guter Pfad wird meist als der, mit den geringsten Kosten bezeichnet, es kann aber auch nach anderen Kriterien gesucht werden (e.g. min-hop-count). \\
-                Algorithmen hier lassen sich weiter klassifizieren: 
-                \begin{itemize}
-                    \item \textbf{Decentralized}
-                        Jeder Router kennt die Kosten zu seinen Nachbarn. Auch Distance Vector Routing gehört hierzu (z.B. BGP oder RIP)
-                    \item \textbf{Global}
-                        Alle Router kennen die komplette Topologie und alle link kosten. Hierzu gehören Link state Algorithmen z.B. Dijkstras oder OSPF. 
-                    \item \textbf{Static} (nicht adaptiv)
-                        Routen ändern sich sehr selten
-                    \item \textbf{Dynamic} (adaptiv)
-                        Routen können sich oft ändern, Hier werden also regelmäßig updates in den Routen gemacht. 
-                \end{itemize}
-        
-    \subsection{Distance Vecotr Routing}
-        Beim Distance Vector Routing tauschen direkte Nachbarn Informationen über Routen mit ihren Nachbarn aus. Jeder Host pflegt eine Tabelle, in der jede mögliche Ziehladdresse eine Reihe und jeder Nachbar eine Spalte hat. In der Tabelle werden dann die "Kosten" der Route eingetragen und mit jeder Iteration verbessert. Konkret schreibt man dann für Route von X to Y via Z als nächsten Hop:
-        $$
-            D^X(Y,Z) = c(X,Z) + min_w\{D^Z(Y,w)\}
-        $$
-                
-            
+	%AUTHOR: Tobias Kratz
+	\subsection{introduction}
+		Im Routing werden dafür gesort, dass Packete vom Empfänger an das richtige Ziehl kommen. Bei Direkt Verbindungen besteht das Problem nicht, jedoch ist das bei großen Netzwerk keine Option, wenn jeder Host mit jedem anderem Verbunden werden muss. Wenn Switches genutzt werden, muss diesen jedoch gesagt werden, wie das Netzwerk aufgebaut ist (Netzwerk Topologie). In diesem Kapitel geht es um das Problem, wie ein Host den besten Weg zu einem Ziehl findet. 
+		
+		\paragraph{Building a large network}
+			Bei großen Netzwerken ist flooding und Hot-potato routing keine Option, da mit jedem Host die Anzahl an Packeten steigt und so mit den beiden Routing uneffizienten Methoden das Netzwerk schnell an sein Limit kommt. Ziel ist es eine Effiziente Methode zu finden, die Packete möglichst schnell ans Ziel bringt, ohne dabei unnötig viel Traffci erzeugt. \\
+			Im folgenden werden zwei Begriffe genutzt:
+			\begin{itemize}
+				\item \textbf{Routing:} determine route taken by packets from source to destination. (Basis: Routing algorithms). 
+				\item \textbf{Forwarding:} move packets from router's input to appropriate router output. 
+			\end{itemize}
+			
+		\subsubsection{Forwarding}
+			Wenn Packete von einem Netzwerk in ein anderes Netzwerk geileitet werden sollen, wird ein router eingesetzt. (Heute haben uns bekannte Router mehrere Aufgaben, die früher von verschiedenen Geräten übernommen wurden: hub, bridge, switch, gateway.) Wenn also Packete von einem Netzwerk in ein anderes gesendet werden sollen, übernimmt der Router die Koordination und leitet das Packet (forwarded) in das entsprechende Ziel Netzwerk. Hängt das andere Netzwerk direkt am selben Router, handelt sich sich um ein single hop. Wenn mindestens 2 Router zwischen den Netzwerken sind, handelt es sich um ein Multi-Hop.
+				
+		\subsubsection{Routing}
+			Routing findet für gewöhnlich auf Layer 3 statt, dort ist das Ziel Packete von Host A zu Host B möglichst effizient zu transportieren bzw. erstmal einen Pfad zu finden, auf dem das möglich ist. Dies wird i.d.R. von Routing Algorithmen durchgeführt. Das Internet besteht aus mehreren AS, die alle wieder aus Teilnetzen bestehen. Jedes AS führt dabei selbst routing Algorithmen aus, um die besten Wege zu finden. 
+			\begin{itemize}
+				\item CONS (CO+NS)
+					Nn CO Networks Routing Algorithmen werden meist in der CON Phase durchgeführt. Im COTS (CO+TS) wissen nur die Endsysteme, dass sie verbunden sind, in CONS hingegen wissen alle Systeme auf der Route, dass die Systeme verbunden sind.
+				\item CLNS (CL+NS)
+					IN CL Networks wird nicht bei jedem Packet der Algorithmus durchgeführt, das würde einen zu großen Overload bedeuten. Manchmal wird beim ersten Packet einer Verbidnung der Algorithmus durchgeführt, das ist allerdings für sich schnell änderte Netzwerke keine Option. Im Inetnet z.B. dies in regelmäßigen Abständen, oder wenn sich große Teile ändern.
+			\end{itemize}
+			
+		\paragraph{optimizing Routing Algorithmen}
+			Routing Algorithmen haben oft unterschiedliche Kriterien, nach denen sie arbeiten:
+			\begin{itemize}
+				\item Average packet delay
+				\item Total throughput
+				\item individual delay (kann jedoch mit anderen Kriterien im Widerspruch stehen)
+			\end{itemize}
+			Am meisten jedoch wird nach dem Kriterium, des minimal-hop-count gearbeitet, da dieser oft einen Kompromiss aus allen Kriterien bedeutet, es gibt jedoch keine Garantie dafür. 
+	
+	\subsection{Routing Algorithms}
+	%Folie 2:14
+		Routing Algorithmen werden meist in zwei Arten aufgeteilt:
+		\begin{itemize}
+			\item \textbf{Non-adaptive Routing Algorithms} \\
+				Diese agieren unabhängig vom State des Netzwerks. Beispiele sind flooding oder preconfiguration. 
+			\item \textbf{Adaptive Routing Algorithms} \\
+				Nehmen den aktuellen Status des Netzwerks mit in Betracht, wenn sie Routing Entscheidung treffen. Beispiel Hierfür wären distance-vector-routing oder link state routing. Das Problem hierbei ist, dass bei sich ändernden Neztwerken die Routen häufig neu entschieden werden. Algorithmen diesen Types sind trotzdem sinnvoll in eignen, fest bekannten Netzen. Bekommt ein Link z.B. so viel Traffic, das Packete verloren gehen, wird der Link als Broken makiert und es kommt zu noch größeren Ausfällen. \\
+				Es gibt dort auch 3 Unterarten: 
+				\begin{itemize}
+					\item Centralized adaptive routing
+					\item Isolated (aka. local) adaptive routing
+					\item Distributed adaptive routing
+				\end{itemize}
+		\end{itemize}
+		
+		\subsubsection{Examples}
+			\paragraph{Flooding}
+				(non-adaptive) Hier wird jedes einkommende Packet an alle bekannten Nachbarn weiterleitet. Das Problem dabei ist, dass so Nezte schnell überlastet werden. Gibt es zum Beispiel schleifen, kann es schnell zu einer Flut an nicht aufhörenden Packeten kommen. Eine Lösung für dieses Problem wäre z.B. das implementieren von TTL (Time to live) oder Sequence Number. TTL werden meist in Hops angegeben und werden bei jedem Hop um 1 dekrementiert. Hat ein Packet ein TTL von 0, wird es weggeworfen. Eine Sequence Number wird beim ersten Router initialisiert. Jeder Router führt eine Tabelle mit Sequence Numbers, die er schon einmal geroutet hat. Kommt ein Packet mit einer Sequence Number, die er schon kennt, wird dieses Packet weggeworfen. \\
+				Flooding macht jedoch durchaus Sinn in sich schnell ändernden Netzen, z.B. bei WLAN oder Mobilfunk oder wenn alle Packete Multicast sind und so wie so mehrere Ziele haben. 
+			
+			\paragraph{Static Routes}
+				(non-adaptive)Static Routes sind großartig für statische, vorhersehbare Umgebungen. Das Problem ist, dass sich das Internet regelmäßig ändert und statische routen dann viel Wartungsaufwand bedeuten. 
+			
+			\paragraph{Centralized Adaptive Routing}
+				(adaptive) Es gibt einen Zentralen Control Center (RCC), der regelmäßig Informationen über die Topologie von allen Routern bekommt und dann einen Idealen Routing Graph erzeugt (z.B. Dijkstra). Das Problem hierbei ist, dass das Netz zusammenbricht, wenn nur der RCC ausfällt. Außerdem werden Routen 'in der Nähe' des RCC bevorzugt, was dort zu einer hohen Last führt während 'abgelegene' Router meist wenig Aufgaben haben. Ebenso bekommen Router die näher am RCC sind schneller die neuen Routing Informationen, was zu unterschiedlichen States führen kann.
+				
+			\paragraph{Isolated (aka. local) adaptive Routing}
+				(non-adaptive) Es werden Entscheidungen über Routen nur lokal getroffen. Beispiele sind Hot potato Routing und Backward learning. 
+				\begin{itemize}
+					\item Hot Potato Routing \\
+						Idee ist es, die Packete so schnell wie möglich loszuwerden, wobei nicht beachtet werden muss, zu welchen Host die Packete geschickt werden. Dieser Algorithmus ist nicht sehr effektiv, es gibt jedoch einige use-Cases in denen diese Art noch genutzt wird (peering/discovering).
+					\item Backward Learning Routing \\
+						Bei diesem Algorithmus werden im Packet Header Source Addresse und Hop Counter hinzugefügt, Router lernen also im laufenden Betrief über die Topologie und passen die Routen im Betrieb an. Jedoch müssen in jungen Netzwerken andere Algorithmen genuztzt werden (z.B. hot potato / flooding). Wenn der Hop-Count == 1 ist, kommt das Packet von einem direkten Nachbarn. Bei einem Hop-Count n>1 ist die source n hops away. 
+				\end{itemize}
+			
+			\paragraph{Distributed Adaptive Routing}
+				Durch Graph Abstraction die besten Routen finden. Knoten sind dabei Router und Kanten die physikalischen Links a.k.a. hops. Die Kosten eines links sind dabei z.B. delay, \$, oder der congestion Layer. Die Kosten eines Pfades sind dann alle link Kosten vereint. Ein guter Pfad wird meist als der, mit den geringsten Kosten bezeichnet, es kann aber auch nach anderen Kriterien gesucht werden (e.g. min-hop-count). \\
+				Algorithmen hier lassen sich weiter klassifizieren: 
+				\begin{itemize}
+					\item \textbf{Decentralized}
+						Jeder Router kennt die Kosten zu seinen Nachbarn. Auch Distance Vector Routing gehört hierzu (z.B. BGP oder RIP)
+					\item \textbf{Global}
+						Alle Router kennen die komplette Topologie und alle link kosten. Hierzu gehören Link state Algorithmen z.B. Dijkstras oder OSPF. 
+					\item \textbf{Static} (nicht adaptiv)
+						Routen ändern sich sehr selten
+					\item \textbf{Dynamic} (adaptiv)
+						Routen können sich oft ändern, Hier werden also regelmäßig updates in den Routen gemacht. 
+				\end{itemize}
+		
+	\subsection{Distance Vecotr Routing}
+		Beim Distance Vector Routing tauschen direkte Nachbarn Informationen über Routen mit ihren Nachbarn aus. Jeder Host pflegt eine Tabelle, in der jede mögliche Ziehladdresse eine Reihe und jeder Nachbar eine Spalte hat. In der Tabelle werden dann die "Kosten" der Route eingetragen und mit jeder Iteration verbessert. Konkret schreibt man dann für Route von X to Y via Z als nächsten Hop:
+		$$
+			D^X(Y,Z) = c(X,Z) + min_w\{D^Z(Y,w)\}
+		$$
+		Mit einem Routing Algorithmus wird dann eine "Distance Table/Matrix" gebaut, mit der dann Routing Tablelen aufgestellt werden, aus denen dann der Distance Vector an die Nachbarn announced werden kann. DVR hat jedoch einige Probleme (count to infinity), jedoch handelt es sich um einen sehr simplen Algorithms.\\
+		DVR Protokolle sind iterativ und Distributed:
+		\begin{itemize}
+			\item \textbf{Iterativ} Das heißt sie laufen nicht unendlich, sondern stoppen sobald keine weiteren Verbesserungen möglich sind. Außerdem sind sie "self-terminating" d.h. es gibt kein Stop Signal o.ä. Eine Iteration wird dabei ausgelöst indem entweder ein loakler link sich ändern z.B. in den Kosten oder wenn es eine Nachricht eines Nachbarn gibt, dass der Link dort sich geändert hat. 
+			\item \textbf{Distributed} Des weiteren tauschen sie Informationen nur mit direkten Nachbarn aus und kennen auch nur den State dieser. Eine Node informiert einen Nachbarn dann über neue Routen, wenn sich die Kosten zu einer Destination verringert haben.
+		\end{itemize}
+
+		\subsubsection{Count to Infinity Problem} 
+			Gegebene Situation: Wir haben 3 Host A,B,C. A ist mit B mit einem Cost von 1 verbunden, und B ist mit C mit einem Cost von 2 verbunden. Daraus ergeben sich folgende 3 Routing Tabellen:
+			\begin{table}[h]
+				\centering
+				\begin{tabular}{|lll|lll|lll|}
+				\hline
+				\multicolumn{3}{|l|}{A} & \multicolumn{3}{l|}{B} & \multicolumn{3}{l|}{C} \\
+				\hline
+				\hline
+				TO   & COST   & VIA   & TO   & COST   & VIA   & TO   & COST   & VIA   \\
+				\hline
+				B    & 1      & B     & A    & 1      & B     & A    & 3      & B     \\
+				C    & 3      & B     & C    & 2      & C     & B    & 2      & B    \\
+				\hline
+				\end{tabular}
+			\end{table}
+			Durch einen Ausfall verschwindet jetzt die Verbindung zwischen B und C. A announced an B jedoch, dass es eine Route zu C mit dem Cost von 3 gibt. B versucht nun also C via A zu erreichen:
+			\begin{table}[h]
+				\centering
+				\begin{tabular}{|lll|lll|lll|}
+				\hline
+				\multicolumn{3}{|l|}{A} & \multicolumn{3}{l|}{B} & \multicolumn{3}{l|}{C} \\
+				\hline
+				\hline
+				TO   & COST   & VIA   & TO   & COST   & VIA   & TO   & COST   & VIA   \\
+				\hline
+				B    & 1      & B     & A    & 1      & B     & A    & -      & -     \\
+				C    & 3      & B     & C    & 4      & A     & B    & -      & -    \\
+				\hline
+				\end{tabular}
+			\end{table}
+			Nachdem B dann diese Information an A sendet, aktualisiert A dann seine Route zu C, da diese über B geht und sich die Kosten erhöht haben. die Route von A nach C via B ist dann wie gewohnt die Route von B nach C + die Kosten von A nach B. A announced das dann wieder an B, der ja nach C über A routet. Er addiert darauf also die Kosten von B nach A. Das läuft dann ungebremst so weiter, bis ins unendliche, \\
+			Möglichkeiten dieses Problem zu lösen:
+			
+			\paragraph{Poisend Reverse Methode} 
+				Wenn die Route von A nach C über B geht, sagt A dem Host B, dass seine Kosten nach C unendlich sind. In einem kleinen Netzwerk wird dann innerhalb weniger Iterationen ein stabiler State erreicht, in größeren Netzwerken besteht das Problem jedoch immernoch, z.B. in einem Netzwerk in dem A,B,C jeweils direkt verbunden sind, und C dann noch eine Verbindung zu D hat. Alle Kosten sind gleich. Fällt dann die Verbindung CD aus, bekommt A immernoch Falsche Routen zu D von B und umgekehrt. 
+			
+			\paragraph{Split Horizon}
+				Wenn Host B seine Routen updatet und das an A sendet und A daraufhin einige Änderungen übernimmt, sendet A diese Änderungen nicht wieder an B, sondern nur an seine anderen Nachbarn.
+	
+	\subsection{Link-State Routing}
+		Beim Link State Routing sammelt für gewöhnlich ein Zentraler Knoten (RCC) Informationen und gibt diese dann an alle anderen Router im Netzwerk weiter. Die Netzwerktopologie ist somit dann allen Router im Netzwerk bekannt. Der RCC baut aus allen gesammelten Informationen einen Grapgen (V,E), wobei V ein set an vertices (nodes) ist und E für die Edges (links) steht.
+		c(v,w) sind dann die Kosten der Kanten. Wenn eine Kante nicht in E ist, ist c unendlich. Das Ziel ist es dann den günstigsten Pfad von node s (source) zu node v zu finden. Hierfür wird meistens Dijkstras verwendet. Jeder Router versendet regelmäßig per flooding ''Link state packages'' mit Informationen, die er zu seinen Nachbarn gesammelt hat (delay, hop count...) und verseht diese mit einer sequence Number und einem ''age flag''. Wenn ein Router so ein Packet bekommt, das er jedoch schon kennt (sequence Number) oder es abgelaufen ist, wirft er es weg. 
+
+		\paragraph{Vergelich LSR und DVR}
+		\begin{table}[h]
+			\resizebox{\textwidth}{!}{%
+			\begin{tabular}{|l|l|l|}
+			\hline
+							   & LSR                                           & DVR                           \\ \hline
+			Message complexity & mit n Knoten und E Kanten werden              & Austausch findet nur zwischen \\
+							   & jedes mal $O(n\cdot E)$ nachrichten versendet & nur zwischen Nachbarn statt   \\ \hline
+			Speed of Covergence & ein $O(n^2)$ Alogorithmus braucht                   & Variiert stark. Es kann zu Routing Schleifen kommen.   \\
+							   & $O(n\cdot E)$ Nachrichten                     & Count-to-infinity Problem     \\ \hline
+			Robustness          & Es können verfälschte Link Kosten announced werden. & Es können verfälschte Path Kosten announced werden.    \\
+								& Jede Router nutzt nur die eigenen Tabellen.         & Die eigenen Routen werden von anderen Routern genutzt. \\ \hline
+			\end{tabular}%
+			}
+		\end{table}
+
+	\subsection{Hierarchical Routing}
+		In der Realität sind große Netze nicht so ideal wie bisher beschrieben, sondern sind meist nicht flach wie wir sie beschrieben haben und Router unterscheiden sich oft fundamental. Im Internet heute gibt es über 1 Milliarde links, die alle zu erreichen würde Routing Tabellen explodieren lassen und der Austausch dieser Tabellen würde jeden Link sprengen. Deswegen ist das Internet in Teilnetze aufgeteilt: Autonomous Systems. 
+
+		\paragraph{Autonomous Systems}
+			Jedes AS hat eine eigene Nummer (z.B. AS421220) und kennt eine Route zu jedem anderen AS. Es gibt im heutigen Internet etwa 60000 solcher Teilnetze und alle sind unterschiedlich groß. Verschiedene AS sind mit pysikalischen Links verbunden (peers), über die Daten ausgetauscht werden. Jeder Router innerhalb eines AS muss also nur die Routen zu anderen Routern im AS kennen, und die Route zu seinem Gateway. Innerhalb eines AS (inra-AS) hat der Administrator freie Wahl für die Nutzung von Routing Algorithmen, es kann z.B. RIP, OSPF oder IGRP verwendet werden. Für die Kommunikation ziwschen AS (Inter-AS) gibt es jedoch einen festen Standart: BGP (Border Gateway Protocoll). \\
+			Für die inter-AS Kommunikation wird ein Gateway Router benötigt, der den Transfer von Daten zu anderen AS koordiniert. Dieser Router pfelgt Routing Tabellen mit anderen Gateayrouter. Der Vorteil dieses Modells ist, dass es für das Reale Internet besser skaliert. Durch die reduzierung von Peers, die in Routing Tabellen gepflegt werden müssen kommt es zu selteren updates der Tabellen, was es leichter macht, schnelle Routen zu finden. Bei Inter-AS Routing gibt es jedoch Regulierungen, welcher Host über wen peeren darf, innerhalb eines AS wird es sowas nicht geben, da ein AS nur eine begrenzte Anzahl Admins hat. Inter-AS Communication kann deswegen eher Performance orientiert sein. 
+
+		\subsubsection{About BGB and Internet Routing}
+			Zum Vegleich die Routing Protokolle RIP \& OSPF:
+			\begin{itemize}
+				\item RIP
+				\begin{itemize}
+					\item DVR
+					\item Erstmal 1983 aufgetaucht. RFC 1058 von 1988
+					\item Am minimalen Hop-Count orientiert
+					\item Poison Reverse
+				\end{itemize}
+				\item OSPF
+				\begin{itemize}
+					\item LSR
+					\item RFC 1131 (inzwischen Version 2 \& 3)
+					\item am meisten verwendete IGP 
+					\item verwendet TCP zum Übertragen von Routing Informationen
+					\item Multicast support
+				\end{itemize}
+			\end{itemize}
+
+			\paragraph{Border Gateway Protocoll}
+				BGP ist der heutige Standart für EGP. Durch regelmäßige "hello" Packete erfahren andere Netzteilnehmer von der existenz des AS. BGP peers bauen dann eine Session auf und tauschen via TCP Routing Informationen aus. Wenn AS1 z.B. AS2 sagt, dass es einen gewissen prefix routen kann, garantiert AS1 AS2 dann allen Traffic weiterzuleiten. BGP kann auch Innerhalb eines AS verwendet werden, man spricht dann von iBGP. Um den Unterschied dann zu inter-AS Communication zu spezifizieren, wird in dem Kontext dann von eBGP gesprochen. \\
+				Eine advertiste Route in BGP besteht immer aus einem Prefix und einem Attribut set. Die zwei wichtigsten Attribute sind 
+				\begin{itemize}
+					\item AS-PATH: Beinhaltet den Pfad, der für die Route genutzt wird (z.B. AS5 AS8 AS10)
+					\item NEXT-HOP: Der nächste AS Router für den nächsten HOP
+				\end{itemize}
+
+				Über die Jahre wurden immer mehr AS registriert und die Zahl steigt weiter (>6000). Das führt dazu, dass es wieder mehr Host gibt, für die alle Routing Einträge gepflegt werden müssen, was die Länge der Tabellen explodieren lässt. Durch die Hohe AS Zahl, kommt es auch regelmäßiger zu Änderungen im System, was Änderungen der Routing Tabellen beudeutet. Große Netze haben zudem eine höhere Fehleranfälligkeit. 
+
+				\paragraph{BGP Security}
+					In BGP stellt jeder AS selbst ein, welches Subnetz er verwaltet. Kommt es bei dem einstellen zu Fehlern ein AS announced ein Subnetz, welches er nicht wirklich organisiert, kommt es zu falschen Routen. So geschehen z.B. 24.02.2008 der Pakistan Telekom (AS17557). Eine generelle Einschätzung zu Routing Security siehe RFC4593. Mit BGP können aber auch Security Operations implementiert werden, z.B. durch setzen einer IP TTL von 255 und es werden nur Routing Informationen mit einer TTL >= 254 verarbeitet. Außerdem können BGP Session mit MD5 Signaturen versehen werden.
+
+		\subsubsection{Mobile Routing}

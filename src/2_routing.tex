@@ -223,6 +223,9 @@
 				\end{itemize}
 		\end{itemize}
 
+		\paragraph{Hierarchical Mobile Routing}
+			In Mobilen Netzen können Ideen des Mobile Routings verwendet werden. Teilnetze können in Cluster aufgeteilt werden. Innerhalb eines Clusters kann proaktives Routing implementiert werden, für die Kommunikation zwischen Clustern können reaktive Algorithmen verwendet werden. Bei kleinen Clustern können alle Nodes sich gegenseitig kennen, es ist also ideal für reaktive Routing. Zwischen Clustern findet seltener Kommunikation statt, und es können mit vielen kleinen Clustern hier am besten reaktive Algorithmen verwendet werden.
+
 		\subsubsection{DSDV}
 			DSDV ist eine Erweiterung des DVR spezialisiert für Mobile Netze. Es gibt 2 große Extensions: 
 			\begin{enumerate}
@@ -247,4 +250,9 @@
 			\paragraph{Path Discovery}
 				Wenn ein Sender ein Packet versenden will, jedoch noch keine Route für das Ziel hat, startet er die Path Discovery. Es wird dabei ein Packet per flooding und boradcast mit der Ziel Addresse und einer einmaligen ID versendet. Wenn ein Host ein solches Packet erhält und er ist das Ziel, sendet er das Packet mit dem Pfad über das es gekommen ist zurück. Das erste Packet dass diesen Host erreicht kam über dem schnellsten Pfad, jedes weitere Packet kann dann verworfen werden. 
 				Es sind noch weitere Optimierungen möglich: 
-				%2:91
+				Wenn die Topologie (bzw. die maximale länge) des Netzes bekannt ist, kann statt einer ID eine conter/TTL hinzugefügt werden. Der Host kann dann am Counter sehen, wie viele Hops das Packet hinter sich hat und es wegwerfen, wenn der Counter größer als der maximale Diameter ist. Eine zweite Verbesserung wäre, wenn Hosts discovery Packete speichern, die sie weiterleiten sollen. Die Informationen dieser Packete können dann für die Suche einer route genutzt werden, wenn das Gerät selbst Packete versenden will. Ist ein Path gefunden, muss jedoch sichergestellt werden, dass dieser auch über die Länge der Verbindung offen bleibt. 
+			\paragraph{Path Maintenance}
+				Nicht genutzte Paths werden nach einer Zeit aus der Routing Tabelle gelöscht. Es ist möglichkeit, ist z.B. als Sender auf eine Bestätigung des Empfängers auf layer 2 zu warten oder so eine explizit zu erfragen. Auch kann eine Station schauen, ob Nachbarn das Packet weiterleiten, wenn diese Technologie unterstützt ist. Falls es ein Problem gibt, können Pfade neu gesucht werden oder es kann versucht werden, den Empfänger zu erreichen und ihm mitzuteilen, dass es ein Problem gab.
+	
+	\subsection{Overlay Routing}
+		Im Overlay Routing sitzt ein Virtuelles Neztwerk auf einem existierenden. Hier können die gleichen Algorithmen verwendet werden. Wird ein Packet in einem Overlay network an den Nachbarn versendet, wird das Packet über das darunter liegende Netz transportiert und kann dort auch über mehrere Hops geleitet werden, während Sender um Empfänger im Overlay Network denken, sie sind dierekte Nachbarn. 

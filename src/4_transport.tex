@@ -1,1 +1,27 @@
 \section{Transport Layer}
+    In Chapter 2 beschrieben, funktioniert Routing von Packeten global am besten Abstrackt. Jedoch gibt es Anwendungen und Fälle, in denen man eine direkte Verbindung zwischen 2 Applications auf je einem Host herstellen will. Der Sender teilt Nachrichten der Application in Segmente und schickt diese weiter an den Network Layer, um zum Ziel geroutet zu werden. Im Network Layer des Empfängers werden die Segmente dann zu Nachrichten zusammengebaut und an die App weitergereicht. \\
+    Im Transport Layer wird die logische Verbindung zwischen Prozessen hergestellt, während im Vergleich der Network Layer die logische Verbindung zwischen Hosts herstellt. Im Internet sind Beispiele für Protokolle des Transport Layers TCP \& UDP. 
+    \begin{itemize}
+        \item TCP
+            \begin{itemize}
+                \item Congestion Control
+                \item Flow Control
+                \item connection Setup \& teardown  (COTS)
+            \end{itemize}
+        \item UDP  
+            \begin{itemize}
+                \item connectionless
+                \item Best-effort implemtierung von IP auf dem Transport Layer
+            \end{itemize}
+    \end{itemize}
+    Keines dieser Protokolle bietet jedoch eine Lösung für Delay \& Bandwidth guarantees.
+
+    \subsection{Segmentation(+Blocking). Multiplexing, Addressing}
+        Die theoretische beschränkung von IP Packeten sind 64k mit Header. TCP Streams sind zum Teil jedoch längern. Um Applications ein Verständnis zu geben, wie Packete verschickt und SDUs zusammengebaut werden, muss dieser Vorang transparent geschehen. Packete können über Multiplexing auf dem Host an alle Applications gesendet werden, und Applications holen sich nur die Packete, die sie brauchen. Das kommt jedoch mit einem großen Sicherheitsproblem, da nun Anwendungen wie Trojaner einfach den Traffic anderer Programme mithören. 
+
+        \paragraph{Sockets and Ports} 
+            Das OSI Modell sieht für die Kommunikation zwischen Programmen und zur identifizierung dieser die Nutzung von lokalen CEPs vor. In Systemen könnte der System PID zur identifizierung benutzt werden, der müsste jedoch für alle Hosts erreichbar sein, außerdem ändert sich dieser bei jedem Neustart des Prozesses oder des Hosts. Im Internet Modell hat man sich jedoch für die Einführung von Ports entschieden. Ein Prozess kann auf einen festen Port announcen oder nach einem zufälligen Port fragen. \\
+            Eine Application ist dann durch einen socket (IP:Port Kombination) erreichbar, wobei die IP die des Empfänger Hosts und die Port Nummer die der Empfänger Application ist. Es gibt gewissen Ports, die für Anwendungen reserviert sind a.k.a. ''well-known'' Ports (IANA: 0-1023). Beispiele sind 22/tcp für ssh, 25/tcp für smtp oder 443/tcp für https. Prozesse die solche Ports öffnen wollen brauchen in der Regel root Privilegien. \\ 
+            Um demultiplexing im Internet zu nutzen, empfängt der Host ein IP Datagram, bestehend aus source und destionation Socket. Diese Datagrams transportieren je ein Transport-Layer segment als Application Data. Das Problem hierbei: Wenn IP eines Tages ersetzt wird, funktionieren TCP/UDP nicht mehr, da die Nutzung von IP:Port hard in die implemtierung gecoded sind. 
+    
+    \subsection{Connection Controll}

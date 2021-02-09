@@ -25,3 +25,47 @@
             Um demultiplexing im Internet zu nutzen, empfängt der Host ein IP Datagram, bestehend aus source und destionation Socket. Diese Datagrams transportieren je ein Transport-Layer segment als Application Data. Das Problem hierbei: Wenn IP eines Tages ersetzt wird, funktionieren TCP/UDP nicht mehr, da die Nutzung von IP:Port hard in die implemtierung gecoded sind. 
     
     \subsection{Connection Controll}
+        Connection Control funktioniert natürlich nur bei CO Protokollen, in unserem Beispiel also nur TCP. Wie schon in Kapitel 1 angeschnitten, gibt es 3 Phasen der einer connection:
+        \begin{itemize}
+            \item CONNECT (herstellen der Verbindung)
+            \item DATA (Transfer von Daten)
+            \item DISCONNECT (Schließen der Verbindung)
+        \end{itemize}
+        Um zwischen Network und Transport Layer Phasen zu unterscheiden, schreibt man dort jeweils ein N-- bzw. T- Prefix zu den Phasen also z.B. T-Connect oder N-Data.
+
+        \subsubsection{Phases}  
+            Die verschiedenen Schritte können confirmed oder unconfirmed ablaufen. T-Connect wird immer confirmed, T-Data wird unconfirmed übertragen (in seltenden Fällen kann das auch confirmed laufen) und T-Disconnect können confirmed und unconfirmed ablaufen. Ein Beispiel für ein Ablauf ist auf 4:20 zu finden. Auch ein State-Diagramm, dass die Übergänge zu verschiedenen State beschreibt ist auf 4:24 enthalten.
+
+            \paragraph{Establishment}
+                Beim T-Connect gibt es mehrere Methoden, die aufgerufen werden (können)
+                \begin{itemize}
+                    \item T-Connect.Request(Destination Address, Source Address)
+                    \item T-Connect.Indication(Destination Address, Source Address)
+                    \item T-Connect.Response(Responding Address)
+                    \item T-Connect.Confirmation(Responding Address)
+                \end{itemize}
+                Wobei die Destination Address die Addresse des Transport Service Users ist, also die Addresse die zum Transport gerufen wird. Die Source Address ist die Addresse des aufrufenden Service Users und die Responding Address die Addresse des Antwortenden Service Users. 
+
+            \paragraph{Data Transfer}
+                \begin{itemize}
+                    \item T-Data.req(userdata)
+                    \item T-Data.ind(userdata)
+                \end{itemize}
+                Die userdata ist dabei die Payload, die von der Application transportiert werden soll. 
+
+            \paragraph{Connection Release}
+                Der Grund für einen Disconnect kann verschieden sein. Es kann zu einem Release kommen durch abruptes verlieren der Verbding oder als Folge des Connects. Das verlieren von TSDUs (T + SDU) ist möglich.
+                \begin{itemize}
+                    \item T-Disconnect.req(userdata)
+                    \item T-Disconnect.ind(cause, userdata)
+                \end{itemize}
+                Der cause für einen Disconnect kann z.B. ein request vom remote User, Quality of service below minimum, error oder auch unknowm sein. Beispiele für Abläufe verschiedener teardowns sind auf 4:23 zu finden. 
+
+        \subsubsection{Error Control}
+            \paragraph{Error Handeling in CONNECT}
+                Bleibt ein T-connect.req (CR) unbeantwortet, es kommt also zu einem Timeout, sendet der Host einfach erneut ein CR. Kommt das erste CR jedoch doch nur verspätet beim Empfänger an, und dieser Antwortet auf das erste CR mit einem CC (Connection confirmation) und bekommt dann das zweite CR, sollte durch einbeziehung des Application Layers der zweite CR unbeantwortet bleiben. Was passiert jedoch, wenn das CC verloren geht und wie geht man damit um? Denn der Empfänger (sender of CC) erwartet jetzt einen Datenaustausch. Eine Lösung wäre hier der Three-Way-Handshake
+
+            \paragraph{Three-Way-Handshake}
+            %4:26
+
+                

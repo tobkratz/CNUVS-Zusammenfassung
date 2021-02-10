@@ -66,5 +66,45 @@
 				Bleibt ein T-connect.req (CR) unbeantwortet, es kommt also zu einem Timeout, sendet der Host einfach erneut ein CR. Kommt das erste CR jedoch doch nur verspätet beim Empfänger an, und dieser Antwortet auf das erste CR mit einem CC (Connection confirmation) und bekommt dann das zweite CR, sollte durch einbeziehung des Application Layers der zweite CR unbeantwortet bleiben. Was passiert jedoch, wenn das CC verloren geht und wie geht man damit um? Denn der Empfänger (sender of CC) erwartet jetzt einen Datenaustausch. Eine Lösung wäre hier der Three-Way-Handshake
 
 			\paragraph{Three-Way-Handshake}
-				
-				
+				Beim Three-Way-Handshake Wird das durch ein T-Connect.rsp ausgelöste CC nochmals bestätigt. Das kann entweder direkt ber Data oder per ACK passieren. Das schützt jedoch nicht davor, dass wenn CC und ACK verloren gehen, der Empfänger nicht sagen kann, ob es sich um eine neue oder alte Anfrage handelt. Eine Lösung wäre die Einführung von Sequence Number ins CR, ACK und CC. Host A sendet eine CR (seq=x) and Host B. B antwortet mit einem ACK(seq=y,ack=x) und A sendet dann z.B. DATA(seq=x,ACK=y). Nur wenn die richtigen Sequence Numbers angehängt sind, findet dann der Datenverkehr statt. Anderer Fall. Es kommt ein alter CR bei B an, dieser Antwortet mit der seq Number, da er nicht weiß wie alt er ist. A empfängt ein ACK zu einem alten CR und sendet jedoch ein REJECT, da die Anfrage nicht mehr relevant ist. 
+			
+			\paragraph{Connection Rejection \& Release}
+				Eine angefragte Verbindung kann jedoch auch Rejected werden. Antwortet ein Empfänger z.B. auf ein CR mit einem DR (Disconnect Request), antwortet der Sender dann mit einem DC (Disconnect Confirm). Normalerweise sendet A ein DR an B, hört jedoch auf eventuelle Daten, die noch unterwegs sein könnten. Er wartet also auf das ACK (DC) von seinem DR und kann währenddessen noch Daten Empfangen. Empfängt er ein DC, kann er sich sicher sein, dass B keine Daten danach mehr sendet. So ein Teardown nennt sich explicit. Ein Implicit Teardown wäre ein Teardown der Network Layer Connection. Das Ziel eines Release ist es, dass beide Seiten alle Daten Empfangen haben und sich nichts mehr mitzuteilen haben. Doch was passiert wenn ein DR/DC/DT verloren geht und nue gesendet werden muss? \\
+				Wie kann man sicher gehen, dass A weiß was B weiß und B das weiß und A weiß dass B das weiß... 
+		
+		\subsubsection{Two Army Problem}
+		Wie koordinieren sich zwei Armeen, die sich nur Boten durch Tal voller Feinde schicken können und wie stimmen sie ab, dass sie gemeinsam angreifen? Man kann sich nie sicher sein, dass die eigene Nachricht angekommen ist. Das ist das gleiche Problem wie beim connection Release, bei dem ist das Risiko jedoch nicht so hoch, und es können Risiken in Kauf genommen werden. Die Lösung für den Connection Release ist es, einenen Timer parallel zum DR zu starten. falls ein DC/ACK verloren geht, timeoutet die connection automatisch und beide Hosts wissen von der geschlossenen Verbindung. 
+
+	\subsection{Flow Control}
+		Bisher wurden Packete einfach per best Effort versendet. Problematisch wird es jedoch, wenn der Sender eine bessere Verbindung hat als der Empfänger. Wie kann der Sender sicher gehen ob und wenn ja welche Packete angekommen sind? Eine Bestätigung für jedes angekommene Packet vom Empfänger würde diesen eventuell noch mehr einschränken. Wird dieses Verfahren dennoch genutzt, kann der Sender einfach die Packete, die nicht geACKt wurden nach einer gewissen Zeit nochmal versenden, was den Empfänger jedoch nochmal mehr belastet. 
+		Eine anderere Lösung ist Flow Control. Das Ziel ist es, langsame Empfänger vor schnellen Sendern zu schützen. Flow Control kann auf zwei Layern implementiert werden: Im Link Layer, dort wird einem Überfluss an "forwading segments" vorgegriffen. Auf höhreren Layern, z.B. auf dem Network oder Transport Layer wird vor einem Überfluss an Conections geschützt. Auf dem Link Layer ist die implementierung simpel, da Segmente eine feste Größe haben, anders auf dem Transport Layer, da können PDUs stark in der Größe variieren. 
+		
+		\paragraph{Buffer Allocation}
+			Ein mit dem Flow Control starj zusammenhängendes Problem ist die Buffer Allocation. Ein Empfänger kann z.B. zwar nicht durch seinen Link eingeschränkt sein, sondern durch das Verarbeiten der Packete. Es wird dann ein Buffer geeigneter Größe erfordert, der eingehende Packete bis zu Bearbeitung/Weiterleitung zwischenspeichern kann. Um als Empfänger die Rate, in der Daten eingehen zu kontrollieren, gibt es verschiene Möglichkeiten. Der Empfänger verlangsamt den Sender, wenn es keinen freien Buffer Space mehr gibt (das kann explizit oder implizit geschehen). Dem kann man vorgreifen, indem der Sender initial Buffer Space anfragt und dieser dann allociert wird, oder der Empfänger announced "Ich habe noch X Buffer Space Verfügbar zur Zeit"
+		
+		\paragraph{Alternating-Bit-Protocol}
+			Es wird angenommen, dass es genug freien Buffer Space nach dem Empfangen eines Packets gibt. Ein Empfänger sendet eine Bestätigung für jedes eingehende Packet. Der Sender warten nach jedem gesendeten Packet auf ein ACK des Empfängers. Der Empfänger sendet das ACK erst, wenn das Packet verarbeitet ist, er kann so also kontrollieren, wann und wie oft Packete eintreffen. Kommt ein ACK beim Sender nicht an, gibt es vier Fälle"
+			\begin{enumerate}
+				\item Packet loss
+				\item ACK-loss
+				\item ACK late (heavy Traffic)
+				\item Ack late (Flow control)
+			\end{enumerate}
+			Der Sender kann jedoch nicht ziwschen den vier Fällen unterscheiden. Nach einer gewissen Zeit sendet er das DT PDU also nochmal. \\
+			Das Alternating-Bit-Protocol ist in der Theorie eine gute Methode für Flow Control, aber eignet es sich auch in realen Umgebungen? In Einem Beispiel senden wir 8KBit von Frankfurt direkt nach NYC über einen 1GBit/s Link. Wir gehen davon aus, dass durch die Hosts kein Delay entsteht. Die Propagation durch die Verbindung ist
+			$$
+				T_{prop} \approx \frac{6200km}{300.000\frac{km}{s}} \approx 20ms
+			$$ 
+			Die Zeit, die das 8KBit Packet braucht, ist etwa
+			$$
+				T_{trans} \approx \frac{8KBit}{10^9\frac{Bit}{s}} \approx 8\mu s
+			$$ 
+			Weiteer nehmen wir an, das ein Ack etwa $1\mu s$ Transmission benötigt. Bis der Sender also 8Kbit übertragen hat und der Sender ein ACK PDU versendet hat und dieses beim Sender ankommt vergehen also $\approx 40.009ms$. Die Utilization des Links ist also etwa:
+			$$
+				U_{sender} = \frac{0,008}{40,009} \approx 0.0002
+			$$
+		
+		\paragraph{Stop and Continue}
+			Eine alternative einfache Möglichkeit ist Stop-and-Continue Methode. Der Sender sendet Daten, bis er vom Empfänger ein Stop bekommt. Er pausiert das senden bis zu einem continue Signal. Das Problem ist jedoch, dass es es bei einem überlasteten Host schwer werden kann, die Stop nachricht zu versenden, wenn es schon zu einem Overflow kommt. Auch kann es sein, dass der Sender Packete versendet, obwohl der Empfänger schon eine Stop Nachricht versendet hat, da die Nachricht noch nicht angekommen ist (Delay). Der Empfänger muss das Stop also schon früh genug versenden, um einen Overflow proaktiv zu vermeiden. Diese Methode funktioniert nur bei Full-Duplex Links. Ein Beispiel für die implementierung ist das XON/XOFF Protokoll.
+
+		\subsubsection{Rate and Credit based Flow Control}

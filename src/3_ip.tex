@@ -1,146 +1,146 @@
 \section{IP \& Internetworking}
-    Das Intenet ist anders implementiert als das ideale Netzwerk. Statt das OSI Modell wird das Internet mit dem TCP/IP Modell in 4 Schichten aufgeteilt:
-    \begin{itemize}
-        \item \textbf{http, ftp,...} Application Layer (OSI 5-7)
-        \item \textbf{TCP/UDP} Transport Layer (OSI 4)
-        \item \textbf{IP} Intenet Layer (OSI 3)
-        \item \textbf{Physical} Network Interface (OSI 1-2)
-    \end{itemize}
-    Layer 1 bis 2 (Physical \& IP) sind Hop by Hop oritentiert, während 2 bis 4 (IP, TCP/UDP \& http,ftp) e2e oritentiert sind. Im weiteren Verlauf wird es konkret um Layer 2 IP (Network Layer, OSI 3) gehen. Beispeiel für Protokolle dieses Layers sind IGMP, ICMP, ARP, IP, RARP. \\
-    Sendet ein Host A ein Datenpacket via IP an Host B, versieht A dieses Packet mit einer einer Destionation Addresse. Dieses Packet wird dann von Routern weitergeleitet, bis es an ziehl kommt.  Ein Beispiel um Routing mit IP zu erklären: \\ Host A (192.0.0.1) sendet ein Packet an 192.0.1.1. Host A hat jedoch keine direkte Verbindung sondern ist mit einem Router verbunden, der die Addresse 192.0.0.1 hat. In einer Routing Tabelle dieses Routers gibt es z.B. folgende Einträg: 192.0.0.0/24  über Link Interface 1 und 192.0.1.0/24 über Link Interface 2. Bekommt der Router also ein Packet mit der Destionation Addresse 192.0.1.1, so ist diese in der zweiten Range drin, und er sendet das Packet über Link 2 weiter. \\ Die Information über die Destionation IP steht im IP Header.
+	Das Intenet ist anders implementiert als das ideale Netzwerk. Statt das OSI Modell wird das Internet mit dem TCP/IP Modell in 4 Schichten aufgeteilt:
+	\begin{itemize}
+		\item \textbf{http, ftp,...} Application Layer (OSI 5-7)
+		\item \textbf{TCP/UDP} Transport Layer (OSI 4)
+		\item \textbf{IP} Intenet Layer (OSI 3)
+		\item \textbf{Physical} Network Interface (OSI 1-2)
+	\end{itemize}
+	Layer 1 bis 2 (Physical \& IP) sind Hop by Hop oritentiert, während 2 bis 4 (IP, TCP/UDP \& http,ftp) e2e oritentiert sind. Im weiteren Verlauf wird es konkret um Layer 2 IP (Network Layer, OSI 3) gehen. Beispeiel für Protokolle dieses Layers sind IGMP, ICMP, ARP, IP, RARP. \\
+	Sendet ein Host A ein Datenpacket via IP an Host B, versieht A dieses Packet mit einer einer Destionation Addresse. Dieses Packet wird dann von Routern weitergeleitet, bis es an ziehl kommt.  Ein Beispiel um Routing mit IP zu erklären: \\ Host A (192.0.0.1) sendet ein Packet an 192.0.1.1. Host A hat jedoch keine direkte Verbindung sondern ist mit einem Router verbunden, der die Addresse 192.0.0.1 hat. In einer Routing Tabelle dieses Routers gibt es z.B. folgende Einträg: 192.0.0.0/24  über Link Interface 1 und 192.0.1.0/24 über Link Interface 2. Bekommt der Router also ein Packet mit der Destionation Addresse 192.0.1.1, so ist diese in der zweiten Range drin, und er sendet das Packet über Link 2 weiter. \\ Die Information über die Destionation IP steht im IP Header.
 
-    \subsection{IP Header}
-        \begin{table}[h]
-            \centering
-            \caption{IP Header, length: \textless{}-- 32 bits  --\textgreater{}}
-            \label{tab:my-table}
-            \begin{tabular}{|l|l|ll|l|l|l|l|}
-                \hline
-                VER\footnote[1]     & IHL\footnote[2]      & \multicolumn{2}{l|}{type of service} & \multicolumn{4}{l|}{lenght\footnote[3]}                     \\ \hline
-                \multicolumn{4}{|l|}{16-bit identifier\footnote[4]}                         & flgs\footnote[4]     & \multicolumn{3}{l|}{fragment offset\footnote[4]} \\ \hline
-                \multicolumn{2}{|l|}{TTL \footnote[5]} & \multicolumn{2}{l|}{protocol\footnote[6]}      & \multicolumn{4}{l|}{Internet Checksum\footnote[7]}          \\ \hline
-                \multicolumn{8}{|l|}{Source IP (32b format)}                                                                      \\ \hline
-                \multicolumn{8}{|l|}{Destination IP (32b format)}                                                                 \\ \hline
-                \multicolumn{8}{|l|}{Options (if any)}                                                                            \\ \hline
-                \multicolumn{8}{|l|}{Data (variable length,}                                                                      \\ \hline
-                \multicolumn{8}{|l|}{typically a TCP or UDP segment)}                                                             \\ \hline
-            \end{tabular}
-        \end{table}
-        \footnotetext[1]{IP protocol Verison Nummer (z.B. 4 oder 6)}
-        \footnotetext[2]{Header länge 32b Word}
-        \footnotetext[3]{Totale Länge in Bytes}
-        \footnotetext[4]{für fragmentation/Wiederherstellen}
-        \footnotetext[5]{Max Hop Anzahl. Wird bei jedem Hop um eins dekrementiert}
-        \footnotetext[6]{Protokoll des höheren Layers, dem das Packet zugestellt werden soll}
-        \footnotetext[7]{Checksum des Headers}
+	\subsection{IP Header}
+		\begin{table}[h]
+			\centering
+			\caption{IP Header, length: \textless{}-- 32 bits  --\textgreater{}}
+			\label{tab:my-table}
+			\begin{tabular}{|l|l|ll|l|l|l|l|}
+				\hline
+				VER\footnote[1]     & IHL\footnote[2]      & \multicolumn{2}{l|}{type of service} & \multicolumn{4}{l|}{lenght\footnote[3]}                     \\ \hline
+				\multicolumn{4}{|l|}{16-bit identifier\footnote[4]}                         & flgs\footnote[4]     & \multicolumn{3}{l|}{fragment offset\footnote[4]} \\ \hline
+				\multicolumn{2}{|l|}{TTL \footnote[5]} & \multicolumn{2}{l|}{protocol\footnote[6]}      & \multicolumn{4}{l|}{Internet Checksum\footnote[7]}          \\ \hline
+				\multicolumn{8}{|l|}{Source IP (32b format)}                                                                      \\ \hline
+				\multicolumn{8}{|l|}{Destination IP (32b format)}                                                                 \\ \hline
+				\multicolumn{8}{|l|}{Options (if any)}                                                                            \\ \hline
+				\multicolumn{8}{|l|}{Data (variable length,}                                                                      \\ \hline
+				\multicolumn{8}{|l|}{typically a TCP or UDP segment)}                                                             \\ \hline
+			\end{tabular}
+		\end{table}
+		\footnotetext[1]{IP protocol Verison Nummer (z.B. 4 oder 6)}
+		\footnotetext[2]{Header länge 32b Word}
+		\footnotetext[3]{Totale Länge in Bytes}
+		\footnotetext[4]{für fragmentation/Wiederherstellen}
+		\footnotetext[5]{Max Hop Anzahl. Wird bei jedem Hop um eins dekrementiert}
+		\footnotetext[6]{Protokoll des höheren Layers, dem das Packet zugestellt werden soll}
+		\footnotetext[7]{Checksum des Headers}
 
-        Der Type of Service referiert auf priority Informationen, dieser Teil des Headers wird eher selten benutzt. Die Total Length ist die Smme inklusive Header und TCP/UDP Segment. Der identifier kann genutzt werden, wenn Packete in mehrere Fragemente gespalten wurden, diese Packete wieder zusammenzusetzen. Wird ein Packet "fragmentiert" bekommen alle bis auf das letzte Fragment den MF (more Fragments) Flag. Ist ein Packet nicht fragmentiert, bekommt es das DF (Don't Fragment) Flag. Im Fragment Offset wird die Position des Fragments typischerweise in 8er Oktets angegeben. 
+		Der Type of Service referiert auf priority Informationen, dieser Teil des Headers wird eher selten benutzt. Die Total Length ist die Smme inklusive Header und TCP/UDP Segment. Der identifier kann genutzt werden, wenn Packete in mehrere Fragemente gespalten wurden, diese Packete wieder zusammenzusetzen. Wird ein Packet "fragmentiert" bekommen alle bis auf das letzte Fragment den MF (more Fragments) Flag. Ist ein Packet nicht fragmentiert, bekommt es das DF (Don't Fragment) Flag. Im Fragment Offset wird die Position des Fragments typischerweise in 8er Oktets angegeben. 
 
-    \subsection{Addressing}
-        In den bisher kennengelernten Routing Algorithmen speicher der Router Addressen in einer Tablle, mit dem entsprechenden Pfad, den er dorthin routet. In großen Netzen kann dann so eine Tabelle sehr schnell sehr groß werden. Außerdem ist es nicht unüblich, dass eine Gerät mehrere (MAC) Addressen hat, da eine MAC-Addresse nicht Host spezifisich ist, sondern Interface speziefich. 
-        
-        \begin{table}[h]
-            \centering
-            \begin{tabular}{|l|l|l|}
-                \hline
-                         & Biespiel          & Verteilung                       \\ \hline \hline
-            MAC Addresse & 70:12:a5:42:93:10 & Flach und Permanent (Hersteller) \\ \hline
-            IP Addresse  & 172.20.42.10      & Topologisch (meistens)           \\ \hline
-            Hostname     & tu-darmstadt.de   & hierarchich                     \\ \hline
-            \end{tabular}
-        \end{table}
+	\subsection{Addressing}
+		In den bisher kennengelernten Routing Algorithmen speicher der Router Addressen in einer Tablle, mit dem entsprechenden Pfad, den er dorthin routet. In großen Netzen kann dann so eine Tabelle sehr schnell sehr groß werden. Außerdem ist es nicht unüblich, dass eine Gerät mehrere (MAC) Addressen hat, da eine MAC-Addresse nicht Host spezifisich ist, sondern Interface speziefich. 
+		
+		\begin{table}[h]
+			\centering
+			\begin{tabular}{|l|l|l|}
+				\hline
+						 & Biespiel          & Verteilung                       \\ \hline \hline
+			MAC Addresse & 70:12:a5:42:93:10 & Flach und Permanent (Hersteller) \\ \hline
+			IP Addresse  & 172.20.42.10      & Topologisch (meistens)           \\ \hline
+			Hostname     & tu-darmstadt.de   & hierarchich                     \\ \hline
+			\end{tabular}
+		\end{table}
 
-        \subsubsection{Naming and DNS}
-            Bei einem Flat namespacing bestehen Namen nur aus einfachen Strings, die von einer Zentralen Stelle verwaltet werden. Hierbei kann es schnell zu doppelungen kommen, da in einer langen Liste schenll der Überblick verloren werden kann. \\
-            Beim Hieracrchical Name Space hingegen wird die Vergabe von Namen dezentralisiert. Es gibt die ersten Namen TLD (Top Level Domain), z.B. de, die dann die Unteraddresse tu-darmstadt an einen anderen Host deligiert. Das kann rekursiev weiterlaufen, tu-darmstadt kann dann z.B. Informatik (informatik.tu-darmstadt.de) an einen weiteren Host deligieren, ohne de darüber zu Informieren. Wie beim Routing auch zeigt sich, dass flache Strukturen nicht funktionieren, in der Praxis wird deswegen beim namespacing auf das hierarchiche Modell gesetzt. 
+		\subsubsection{Naming and DNS}
+			Bei einem Flat namespacing bestehen Namen nur aus einfachen Strings, die von einer Zentralen Stelle verwaltet werden. Hierbei kann es schnell zu doppelungen kommen, da in einer langen Liste schenll der Überblick verloren werden kann. \\
+			Beim Hieracrchical Name Space hingegen wird die Vergabe von Namen dezentralisiert. Es gibt die ersten Namen TLD (Top Level Domain), z.B. de, die dann die Unteraddresse tu-darmstadt an einen anderen Host deligiert. Das kann rekursiev weiterlaufen, tu-darmstadt kann dann z.B. Informatik (informatik.tu-darmstadt.de) an einen weiteren Host deligieren, ohne de darüber zu Informieren. Wie beim Routing auch zeigt sich, dass flache Strukturen nicht funktionieren, in der Praxis wird deswegen beim namespacing auf das hierarchiche Modell gesetzt. 
 
-        \subsubsection{IPv4 Addresses}
-            IPv4 Addressen sind in Blocks aufgeteilt, die für verschiedene Zwecke gedacht sind. 
-            \begin{itemize}
-                \item CLASS A: Organisation <= 16 Millionen Hosts. First Bit 0, first 8 for Net, last 24 Bit Host.
-                \item CLASS B: Organisation <= 65 Tausend Hosts. First Bits 10, first 16 for Net, last 16 Bit Host.
-                \item CLASS C: Organisation <= 255 Hosts. First Bits 110, first 24 for Net, last 8 Bit Host.
-                \item CLASS D: Multicast Addressen. First Bits 1110, last 28 Bits for Multicast Addresses
-                \item CLASS E: Reserviert (Privat, Dokumentation...) Firsts Bits 1111, last 28 reserved. 
-            \end{itemize}
-            Eine Netzwerkaddresse wird angegeben durch die festen Werte (First Bits \& Net) und die Host bits, wobei die alle 0 sind. Die letzte Addresse (Host bits sind alle 1) ist für Broadcast reserviert. 127.0.0.0/8 sind für loopback Anwendungen reserviert, Packete an diese Addresse werden am lokalen Host bearbeitet. Das /8 eben nennt man eine Netzmaske. Diese gibt an, wie groß das Teilnetz ist, also bei einem CLASS A z.B. /8, weil die ersten 8 Bits fest sind, CLASS B /16 und so weiter. Alternativ schreibt man auch: 11111111.00000000.00000000.00000000 (255.0.0.0, /8). \\
-            Einem Host Interface wird in der Regel ein /32, also eine genaue IP Addresse zugewiesen. Ein Host kann mehrere Interfaces, also auch mehrere Addressen haben. Einem Teilnetz wird dann ein Subnetz zugewiesen, in dem sich alle Hosts dieses Netzes befinden. Für lokale Netze werden in der Regel /24 verwendet. Ein Router, der mehrere Netze verwaltet, mehr sich dann nicht jede einzelende Addresse, sondern nur die Teilnetze je Interface. Ein Beispielrouter verwalter 3 Netze auf je einem Interface. Netz 1 läuft über Interface 1 mit 192.0.1.0/24, Netz 2 Interface 2 mit 192.0.2.0/24 und Netz 3 Interface 3 192.0.3.0/24. 
-            \paragraph{Subnetting}
-                Ein Größerer IP Bereich kann auch in mehrere Subnetze geteilt werden, so kann von einem /16 z.B. ein /24 abgespalten werden. von den 16 Hosts bits werden die ersten 8 dann zu einer Subnet ID, die das Subnetz identifiziert. Die Netzmaske wird dann für Hosts innerhalb dieses Subnetzes ebenfalls angepasst. Aus einem Netz mit 256*256-2 (Broadcast \& Network Address) Addressen kann so ein Netz mit 254 Subnetzen je 254 Hosts gebaut werden. Ein Subnetz ist jedoch nicht darauf beschränkt ein /24 zu sein, es können Variable Längen für Subnetze verwendet werden zwischen /17 und /32. In diesem Kontext spricht man von Variable Length Subnet Mask (VLSM). Damit lassen sich Wartungsarbeiten für ISPs z.B. verringern. ein ISP announced z.B., dass er sich um ein /20 kümmert, und leitet dann teile davon an unterschiedliche Organisationen weiter (z.B. /23 Subnets). Das erlaubt es, IP Addressen mehr effizient zu nutzen. Wenn eine Organisation z.B. 2k Addressen braucht, rein ein CLASS C Nezt nicht mehr aus. Es wird ein Class B Netz zugewiesen, auch wenn dann ~63k Addressen ungenutzt bleiben. VLSM erlauben es, Addressen mehr effizient zu nutzen. So kann der Organisation z.B. aus einem CLASS B Netz eines ISPs ein /21 zugewiesen werden, dass dann $2^{32-21} = 2048$ Addressen ermöglicht zugewiesen werden. 
-            \paragraph{Advertising}
-                Doch wie kommt ein Host am Ende an seine IP Addresse? Koordinierung durch Menschen kann sehr umständlich werden und schnell aus dem Ruder laufen. Es kann ein DHCP eingesetzt werden, der ein zugeteiltes Subnetz an verbundene Geräte verteilt. Ein solcher DHCP Server wird meistens auf dem default Gateway betrieben, und weißt IP Addressen anhand der MAC Addresse eines Interfaces zu. 
+		\subsubsection{IPv4 Addresses}
+			IPv4 Addressen sind in Blocks aufgeteilt, die für verschiedene Zwecke gedacht sind. 
+			\begin{itemize}
+				\item CLASS A: Organisation <= 16 Millionen Hosts. First Bit 0, first 8 for Net, last 24 Bit Host.
+				\item CLASS B: Organisation <= 65 Tausend Hosts. First Bits 10, first 16 for Net, last 16 Bit Host.
+				\item CLASS C: Organisation <= 255 Hosts. First Bits 110, first 24 for Net, last 8 Bit Host.
+				\item CLASS D: Multicast Addressen. First Bits 1110, last 28 Bits for Multicast Addresses
+				\item CLASS E: Reserviert (Privat, Dokumentation...) Firsts Bits 1111, last 28 reserved. 
+			\end{itemize}
+			Eine Netzwerkaddresse wird angegeben durch die festen Werte (First Bits \& Net) und die Host bits, wobei die alle 0 sind. Die letzte Addresse (Host bits sind alle 1) ist für Broadcast reserviert. 127.0.0.0/8 sind für loopback Anwendungen reserviert, Packete an diese Addresse werden am lokalen Host bearbeitet. Das /8 eben nennt man eine Netzmaske. Diese gibt an, wie groß das Teilnetz ist, also bei einem CLASS A z.B. /8, weil die ersten 8 Bits fest sind, CLASS B /16 und so weiter. Alternativ schreibt man auch: 11111111.00000000.00000000.00000000 (255.0.0.0, /8). \\
+			Einem Host Interface wird in der Regel ein /32, also eine genaue IP Addresse zugewiesen. Ein Host kann mehrere Interfaces, also auch mehrere Addressen haben. Einem Teilnetz wird dann ein Subnetz zugewiesen, in dem sich alle Hosts dieses Netzes befinden. Für lokale Netze werden in der Regel /24 verwendet. Ein Router, der mehrere Netze verwaltet, mehr sich dann nicht jede einzelende Addresse, sondern nur die Teilnetze je Interface. Ein Beispielrouter verwalter 3 Netze auf je einem Interface. Netz 1 läuft über Interface 1 mit 192.0.1.0/24, Netz 2 Interface 2 mit 192.0.2.0/24 und Netz 3 Interface 3 192.0.3.0/24. 
+			\paragraph{Subnetting}
+				Ein Größerer IP Bereich kann auch in mehrere Subnetze geteilt werden, so kann von einem /16 z.B. ein /24 abgespalten werden. von den 16 Hosts bits werden die ersten 8 dann zu einer Subnet ID, die das Subnetz identifiziert. Die Netzmaske wird dann für Hosts innerhalb dieses Subnetzes ebenfalls angepasst. Aus einem Netz mit 256*256-2 (Broadcast \& Network Address) Addressen kann so ein Netz mit 254 Subnetzen je 254 Hosts gebaut werden. Ein Subnetz ist jedoch nicht darauf beschränkt ein /24 zu sein, es können Variable Längen für Subnetze verwendet werden zwischen /17 und /32. In diesem Kontext spricht man von Variable Length Subnet Mask (VLSM). Damit lassen sich Wartungsarbeiten für ISPs z.B. verringern. ein ISP announced z.B., dass er sich um ein /20 kümmert, und leitet dann teile davon an unterschiedliche Organisationen weiter (z.B. /23 Subnets). Das erlaubt es, IP Addressen mehr effizient zu nutzen. Wenn eine Organisation z.B. 2k Addressen braucht, rein ein CLASS C Nezt nicht mehr aus. Es wird ein Class B Netz zugewiesen, auch wenn dann ~63k Addressen ungenutzt bleiben. VLSM erlauben es, Addressen mehr effizient zu nutzen. So kann der Organisation z.B. aus einem CLASS B Netz eines ISPs ein /21 zugewiesen werden, dass dann $2^{32-21} = 2048$ Addressen ermöglicht zugewiesen werden. 
+			\paragraph{Advertising}
+				Doch wie kommt ein Host am Ende an seine IP Addresse? Koordinierung durch Menschen kann sehr umständlich werden und schnell aus dem Ruder laufen. Es kann ein DHCP eingesetzt werden, der ein zugeteiltes Subnetz an verbundene Geräte verteilt. Ein solcher DHCP Server wird meistens auf dem default Gateway betrieben, und weißt IP Addressen anhand der MAC Addresse eines Interfaces zu. 
 
-        \subsubsection{NAT}
-            In der Summe gibt es $2^{32} = ~4$ Milliarden IPv4 Addressen. Was zu den 70er noch unfassbar viel war, wird heute knapp. IPv4 Addressen gehen heute für über 20\$ das Stück über den Tisch, bei großen zusammenhängenden Netzen teils noch mehr. Eine Lösung wäre IPv6 ($2^{128}$ Addressen), dafür sind einige Menschen aber zu faul. Eine\footnote{Nicht schöne!!!!} Lösung für das Problem ist NAT. \\
-            Bei einem NAT hat ein Gateway eine öffentliche Addresse einem Gateway zugewiesen. Hinter diesem Gateway können sich mehrere Hosts befinden, die mit Addressen aus einem local Network Bereich versehen werden. Packete, die aus dem lokalen Netzwerk versendet werden, bekommen dann die Source Addresse des Gateways. Für Hosts außerhalb des Netzes sieht es dann so aus, als käme der Gesamte Traffic nur von einem Host (Gateway). \\
-            NAT hat  jedoch den Vorteil, dass nicht direkt auf Geräte innerhlab eines lokalen Netzes zugegriffen werden kann, außerdem kann sich die öffentliche IP Addresse ändern (z.B. durch wechseln des ISP), ohne dass das lokale Netzwerk neu konfiguriert werden muss. Jedoch greift der Router durch die Manipulation in des IP Headers in den Traffic ein. Ein Router sollte jedoch maximal 3 Layer bearbeiten. Außerdem funktionieren e2e oder p2p Anwendungen nicht mehr richtig, wenn ein Host innerhlab eines NATs ist. Außerdem ist jeder Host auf maximal 65k connections beschränkt (max anzahl Ports). Bei einem NAT sind alle Geräte jedoch auf insgesamt 65k Ports beschränkt, da das gateway nur soviel Ports hat.
+		\subsubsection{NAT}
+			In der Summe gibt es $2^{32} = ~4$ Milliarden IPv4 Addressen. Was zu den 70er noch unfassbar viel war, wird heute knapp. IPv4 Addressen gehen heute für über 20\$ das Stück über den Tisch, bei großen zusammenhängenden Netzen teils noch mehr. Eine Lösung wäre IPv6 ($2^{128}$ Addressen), dafür sind einige Menschen aber zu faul. Eine\footnote{Nicht schöne!!!!} Lösung für das Problem ist NAT. \\
+			Bei einem NAT hat ein Gateway eine öffentliche Addresse einem Gateway zugewiesen. Hinter diesem Gateway können sich mehrere Hosts befinden, die mit Addressen aus einem local Network Bereich versehen werden. Packete, die aus dem lokalen Netzwerk versendet werden, bekommen dann die Source Addresse des Gateways. Für Hosts außerhalb des Netzes sieht es dann so aus, als käme der Gesamte Traffic nur von einem Host (Gateway). \\
+			NAT hat  jedoch den Vorteil, dass nicht direkt auf Geräte innerhlab eines lokalen Netzes zugegriffen werden kann, außerdem kann sich die öffentliche IP Addresse ändern (z.B. durch wechseln des ISP), ohne dass das lokale Netzwerk neu konfiguriert werden muss. Jedoch greift der Router durch die Manipulation in des IP Headers in den Traffic ein. Ein Router sollte jedoch maximal 3 Layer bearbeiten. Außerdem funktionieren e2e oder p2p Anwendungen nicht mehr richtig, wenn ein Host innerhlab eines NATs ist. Außerdem ist jeder Host auf maximal 65k connections beschränkt (max anzahl Ports). Bei einem NAT sind alle Geräte jedoch auf insgesamt 65k Ports beschränkt, da das gateway nur soviel Ports hat.
 
-            \paragraph{NAT Translation}
-                Wenn ein Computer innerhalb eines lokalen Netzes hinter einem NAT Packete aus dem Netz verschicken will, versieht er jedoch den IP Header mit seiner lokalen Source Addresse. Damit z.B. ein Antwort Packet am Router wieder ankommt muss dieser jedoch seine öffentliche IP als Source IP in den Header eintragen. Außerdem wird der Port geändert, damit die connection am Router mit dem Port des Hosts aufrecht erhalten werden kann. Ankommende Packete werden dann wieder vom Router statt mit der NAT-Adresse mit der lokalen Addresse des Hosts versehen und innerhalb des Netzes geroutet. 
+			\paragraph{NAT Translation}
+				Wenn ein Computer innerhalb eines lokalen Netzes hinter einem NAT Packete aus dem Netz verschicken will, versieht er jedoch den IP Header mit seiner lokalen Source Addresse. Damit z.B. ein Antwort Packet am Router wieder ankommt muss dieser jedoch seine öffentliche IP als Source IP in den Header eintragen. Außerdem wird der Port geändert, damit die connection am Router mit dem Port des Hosts aufrecht erhalten werden kann. Ankommende Packete werden dann wieder vom Router statt mit der NAT-Adresse mit der lokalen Addresse des Hosts versehen und innerhalb des Netzes geroutet. 
 
-        \subsubsection{ARP}
-            Wie können Host innerhlab eines lokalen Netzes wissen, welche MAC Addresse hinter einer IP steht? ARP (Address Resolution Protocol) Anfragen! Bei einer ARP Anfrage sendet ein Host via Broadcast an alle Geräte im Netzwerk eine Anfrage: Wer hat IP X? Tell IP Y! Der Host mit IP X fühlt sich angesprochen und antwortet mit seiner MAC Addresse. Host X speichert dann die IP/MAC Kombination in einer Tabelle, bis diese Information abläuft. Es sind jedoch Probleme wie ARP cache poisoning denkbar.
+		\subsubsection{ARP}
+			Wie können Host innerhlab eines lokalen Netzes wissen, welche MAC Addresse hinter einer IP steht? ARP (Address Resolution Protocol) Anfragen! Bei einer ARP Anfrage sendet ein Host via Broadcast an alle Geräte im Netzwerk eine Anfrage: Wer hat IP X? Tell IP Y! Der Host mit IP X fühlt sich angesprochen und antwortet mit seiner MAC Addresse. Host X speichert dann die IP/MAC Kombination in einer Tabelle, bis diese Information abläuft. Es sind jedoch Probleme wie ARP cache poisoning denkbar.
 
-    \subsection{IPv6}
-        Da IPv4 Addressen inzwischen eng werden, wurde ende der 90er IPv6 (RFC 2460) introduced. Neben dem Ziel, genug Addressen für alle Geräte zu haben und um z.B. NAT los zu werden, gibt es noch weiter Vorteile. 
-        \begin{itemize}
-            \item 'traffic class' und 'flow labels' ermöglichen QoS
-            \item Flexible Anzahl an Routing hierarchie Leveln
-            \item Serverless Plug-and-Play
-            \item Breite e2e und p2p, IP layer Authentication \& encryption möglich
-            \item Besserer Support für Mobile Devices
-        \end{itemize}
-        \paragraph{IPv6 Header}
-            Im Vergleich zum IPv4 Header fallen einige Feleder weg. 
-            \begin{table}[h]
-                \centering
-                \caption{IPv6 Header, length: \textless{}-- 32 bits  --\textgreater{}}
-                \label{tab:my-table2}
-                \begin{tabular}{|l|l|ll|l|l|l|l|}
-                    \hline
-                    VER     &      \multicolumn{2}{l|}{Traffic Class} & \multicolumn{5}{l|}{Flow Label}                     \\ \hline
-                    \multicolumn{4}{|l|}{Payload Length}                         &  \multicolumn{2}{l|}{Next Header}   & \multicolumn{2}{l|}{Hop Limit} \\ \hline
-                    \multicolumn{8}{|l|}{Source IP (32b format, 16 Bytes)}                                                                      \\\multicolumn{8}{|l|}{}  \\\multicolumn{8}{|l|}{}  \\\multicolumn{8}{|l|}{}  \\\hline
-                    \multicolumn{8}{|l|}{Destination IP (32b format, 16 Bytes)}                                                                 \\\multicolumn{8}{|l|}{}  \\\multicolumn{8}{|l|}{}  \\\multicolumn{8}{|l|}{}  \\\hline
-                \end{tabular}
-            \end{table} \\
-            Der v6 Header hat insgesamt die doppelte Länge (40 bytes), im Vergleich zum v4 Header. Im Vergleich zum v4 Header ist die größe hier fix, es können jedoch im Next Header viel TCP/UDP oder IPv6 extension Header genutzt werden. Traffic Class ist das Äquivalent zu Type of Service. Hop Limit ist Äquivalent zum alten TTL.
+	\subsection{IPv6}
+		Da IPv4 Addressen inzwischen eng werden, wurde ende der 90er IPv6 (RFC 2460) introduced. Neben dem Ziel, genug Addressen für alle Geräte zu haben und um z.B. NAT los zu werden, gibt es noch weiter Vorteile. 
+		\begin{itemize}
+			\item 'traffic class' und 'flow labels' ermöglichen QoS
+			\item Flexible Anzahl an Routing hierarchie Leveln
+			\item Serverless Plug-and-Play
+			\item Breite e2e und p2p, IP layer Authentication \& encryption möglich
+			\item Besserer Support für Mobile Devices
+		\end{itemize}
+		\paragraph{IPv6 Header}
+			Im Vergleich zum IPv4 Header fallen einige Feleder weg. 
+			\begin{table}[h]
+				\centering
+				\caption{IPv6 Header, length: \textless{}-- 32 bits  --\textgreater{}}
+				\label{tab:my-table2}
+				\begin{tabular}{|l|l|ll|l|l|l|l|}
+					\hline
+					VER     &      \multicolumn{2}{l|}{Traffic Class} & \multicolumn{5}{l|}{Flow Label}                     \\ \hline
+					\multicolumn{4}{|l|}{Payload Length}                         &  \multicolumn{2}{l|}{Next Header}   & \multicolumn{2}{l|}{Hop Limit} \\ \hline
+					\multicolumn{8}{|l|}{Source IP (32b format, 16 Bytes)}                                                                      \\\multicolumn{8}{|l|}{}  \\\multicolumn{8}{|l|}{}  \\\multicolumn{8}{|l|}{}  \\\hline
+					\multicolumn{8}{|l|}{Destination IP (32b format, 16 Bytes)}                                                                 \\\multicolumn{8}{|l|}{}  \\\multicolumn{8}{|l|}{}  \\\multicolumn{8}{|l|}{}  \\\hline
+				\end{tabular}
+			\end{table} \\
+			Der v6 Header hat insgesamt die doppelte Länge (40 bytes), im Vergleich zum v4 Header. Im Vergleich zum v4 Header ist die größe hier fix, es können jedoch im Next Header viel TCP/UDP oder IPv6 extension Header genutzt werden. Traffic Class ist das Äquivalent zu Type of Service. Hop Limit ist Äquivalent zum alten TTL.
 
-        \paragraph{IPv6 Addresses}
-            v6 Addressen werden als 8x16 Bit Blöcke in hex Nummern geschrieben, wobei mit :: alles mit 00 gefüllt wird. Beispiel: fd42:4242:f31a:: = fd42:4242:f31a:0000:0000:0000:000:0000. Es kann auch genutzt werden um Blöcke aufzufüllen, z.B fd42:4242:f31a::abba = fd42:4242:f31a:0000:0000:0000:0000:abba. Die 128 Bits einer IPv6 Addresse sind wie folgt aufgeteilt:
-            \begin{table}[h]
-                \centering
-                \begin{tabular}{llllll}
-                3 &
-                  13 &
-                  8 &
-                  24 &
-                  16 &
-                  64 \\ \hline
-                \multicolumn{1}{|l|}{001} &
-                  \multicolumn{1}{l|}{TLA ID} &
-                  \multicolumn{1}{l|}{Res} &
-                  \multicolumn{1}{l|}{NLA ID} &
-                  \multicolumn{1}{l|}{SLA ID} &
-                  \multicolumn{1}{l|}{Interface ID} \\ \hline
-                \end{tabular}
-            \end{table} \\ 
-            Wobei:
-            \begin{itemize}
-                \item TLA: Top Level Aggregation (IANA teilt diese ISPs zu)
-                \item Res: Reserviert für vergrößerung des TLA oder NLA
-                \item NLA: next-level (Kann zur Organisation von Routing Hierarchie verwendet werden)
-                \item SLA: Site-level (Organisationen können den Bereich für Subnetting nutzen)
-                \item Interface ID: Generierter Suffix für z.B. Endgräte. Hier kann auch ein v6 Suffix aus der MAC Addresse generiert werden: 
-                \begin{itemize}
-                    \item in 2x24 Bits aufteilen, FFFE Einfügen und 7tes Bit invertieren. z.B. 9042:fe34:3413 → 9242:feff:fe34:3413
-                    \item Diese Methode ist jedoch sehr umstritten, da Geräte so weltweit getrackt werden könne. stattdessen lassen sich auch zufällig generierte Suffixe verwenden.
-                \end{itemize} 
-            \end{itemize}
+		\paragraph{IPv6 Addresses}
+			v6 Addressen werden als 8x16 Bit Blöcke in hex Nummern geschrieben, wobei mit :: alles mit 00 gefüllt wird. Beispiel: fd42:4242:f31a:: = fd42:4242:f31a:0000:0000:0000:000:0000. Es kann auch genutzt werden um Blöcke aufzufüllen, z.B fd42:4242:f31a::abba = fd42:4242:f31a:0000:0000:0000:0000:abba. Die 128 Bits einer IPv6 Addresse sind wie folgt aufgeteilt:
+			\begin{table}[h]
+				\centering
+				\begin{tabular}{llllll}
+				3 &
+				  13 &
+				  8 &
+				  24 &
+				  16 &
+				  64 \\ \hline
+				\multicolumn{1}{|l|}{001} &
+				  \multicolumn{1}{l|}{TLA ID} &
+				  \multicolumn{1}{l|}{Res} &
+				  \multicolumn{1}{l|}{NLA ID} &
+				  \multicolumn{1}{l|}{SLA ID} &
+				  \multicolumn{1}{l|}{Interface ID} \\ \hline
+				\end{tabular}
+			\end{table} \\ 
+			Wobei:
+			\begin{itemize}
+				\item TLA: Top Level Aggregation (IANA teilt diese ISPs zu)
+				\item Res: Reserviert für vergrößerung des TLA oder NLA
+				\item NLA: next-level (Kann zur Organisation von Routing Hierarchie verwendet werden)
+				\item SLA: Site-level (Organisationen können den Bereich für Subnetting nutzen)
+				\item Interface ID: Generierter Suffix für z.B. Endgräte. Hier kann auch ein v6 Suffix aus der MAC Addresse generiert werden: 
+				\begin{itemize}
+					\item in 2x24 Bits aufteilen, FFFE Einfügen und 7tes Bit invertieren. z.B. 9042:fe34:3413 → 9242:feff:fe34:3413
+					\item Diese Methode ist jedoch sehr umstritten, da Geräte so weltweit getrackt werden könne. stattdessen lassen sich auch zufällig generierte Suffixe verwenden.
+				\end{itemize} 
+			\end{itemize}
 
-            Bisher ist jedoch kein Fester Stichtag für die Umstellung von IPv4 auf IPv6 vorgesehen, und der Übergang scheint such sehr schleppend zu sein. IPv6 kann jedoch auch zwischen Netzen übertragen werden, die eigentlich nur IPv4 betreiben. IPv6 Packete können dann als Payload in IPv4 Packeten versendet werden. IPv6 Routen sind i.d.R. auch in der Lage IPv4 Routen zu handeln. 
+			Bisher ist jedoch kein Fester Stichtag für die Umstellung von IPv4 auf IPv6 vorgesehen, und der Übergang scheint such sehr schleppend zu sein. IPv6 kann jedoch auch zwischen Netzen übertragen werden, die eigentlich nur IPv4 betreiben. IPv6 Packete können dann als Payload in IPv4 Packeten versendet werden. IPv6 Routen sind i.d.R. auch in der Lage IPv4 Routen zu handeln. 
 
-            \paragraph{Futher Improvements}
-                Die Umstellung auf IPv6 betrifft jedoch auch Protokolle wie DHCP. Das Ziel hierbei ist es jedoch, Adressing und Routing zu vereinfachen. Neighbor Discovery durch ARP Anfragen fällt auch weg und wird durch ICMPv6 ersetzt. Auch hilfreich sind Methoden wie Link-local, wo mit fe80::/10 Direkt übertragen werden können, befor sie global geroutet werden. Es gibt zwar eine v6 Alternative zu DHCP: DHCPv6 es wird jedoch empfohlen Stateless Address Autoconfiguration (SLAAC) zu verwenden.
+			\paragraph{Futher Improvements}
+				Die Umstellung auf IPv6 betrifft jedoch auch Protokolle wie DHCP. Das Ziel hierbei ist es jedoch, Adressing und Routing zu vereinfachen. Neighbor Discovery durch ARP Anfragen fällt auch weg und wird durch ICMPv6 ersetzt. Auch hilfreich sind Methoden wie Link-local, wo mit fe80::/10 Direkt übertragen werden können, befor sie global geroutet werden. Es gibt zwar eine v6 Alternative zu DHCP: DHCPv6 es wird jedoch empfohlen Stateless Address Autoconfiguration (SLAAC) zu verwenden.
 
 

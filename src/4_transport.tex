@@ -1,71 +1,70 @@
 \section{Transport Layer}
-    In Chapter 2 beschrieben, funktioniert Routing von Packeten global am besten Abstrackt. Jedoch gibt es Anwendungen und Fälle, in denen man eine direkte Verbindung zwischen 2 Applications auf je einem Host herstellen will. Der Sender teilt Nachrichten der Application in Segmente und schickt diese weiter an den Network Layer, um zum Ziel geroutet zu werden. Im Network Layer des Empfängers werden die Segmente dann zu Nachrichten zusammengebaut und an die App weitergereicht. \\
-    Im Transport Layer wird die logische Verbindung zwischen Prozessen hergestellt, während im Vergleich der Network Layer die logische Verbindung zwischen Hosts herstellt. Im Internet sind Beispiele für Protokolle des Transport Layers TCP \& UDP. 
-    \begin{itemize}
-        \item TCP
-            \begin{itemize}
-                \item Congestion Control
-                \item Flow Control
-                \item connection Setup \& teardown  (COTS)
-            \end{itemize}
-        \item UDP  
-            \begin{itemize}
-                \item connectionless
-                \item Best-effort implemtierung von IP auf dem Transport Layer
-            \end{itemize}
-    \end{itemize}
-    Keines dieser Protokolle bietet jedoch eine Lösung für Delay \& Bandwidth guarantees.
+	In Chapter 2 beschrieben, funktioniert Routing von Packeten global am besten Abstrackt. Jedoch gibt es Anwendungen und Fälle, in denen man eine direkte Verbindung zwischen 2 Applications auf je einem Host herstellen will. Der Sender teilt Nachrichten der Application in Segmente und schickt diese weiter an den Network Layer, um zum Ziel geroutet zu werden. Im Network Layer des Empfängers werden die Segmente dann zu Nachrichten zusammengebaut und an die App weitergereicht. \\
+	Im Transport Layer wird die logische Verbindung zwischen Prozessen hergestellt, während im Vergleich der Network Layer die logische Verbindung zwischen Hosts herstellt. Im Internet sind Beispiele für Protokolle des Transport Layers TCP \& UDP. 
+	\begin{itemize}
+		\item TCP
+			\begin{itemize}
+				\item Congestion Control
+				\item Flow Control
+				\item connection Setup \& teardown  (COTS)
+			\end{itemize}
+		\item UDP  
+			\begin{itemize}
+				\item connectionless
+				\item Best-effort implemtierung von IP auf dem Transport Layer
+			\end{itemize}
+	\end{itemize}
+	Keines dieser Protokolle bietet jedoch eine Lösung für Delay \& Bandwidth guarantees.
 
-    \subsection{Segmentation(+Blocking). Multiplexing, Addressing}
-        Die theoretische beschränkung von IP Packeten sind 64k mit Header. TCP Streams sind zum Teil jedoch längern. Um Applications ein Verständnis zu geben, wie Packete verschickt und SDUs zusammengebaut werden, muss dieser Vorang transparent geschehen. Packete können über Multiplexing auf dem Host an alle Applications gesendet werden, und Applications holen sich nur die Packete, die sie brauchen. Das kommt jedoch mit einem großen Sicherheitsproblem, da nun Anwendungen wie Trojaner einfach den Traffic anderer Programme mithören. 
+	\subsection{Segmentation(+Blocking). Multiplexing, Addressing}
+		Die theoretische beschränkung von IP Packeten sind 64k mit Header. TCP Streams sind zum Teil jedoch längern. Um Applications ein Verständnis zu geben, wie Packete verschickt und SDUs zusammengebaut werden, muss dieser Vorang transparent geschehen. Packete können über Multiplexing auf dem Host an alle Applications gesendet werden, und Applications holen sich nur die Packete, die sie brauchen. Das kommt jedoch mit einem großen Sicherheitsproblem, da nun Anwendungen wie Trojaner einfach den Traffic anderer Programme mithören. 
 
-        \paragraph{Sockets and Ports} 
-            Das OSI Modell sieht für die Kommunikation zwischen Programmen und zur identifizierung dieser die Nutzung von lokalen CEPs vor. In Systemen könnte der System PID zur identifizierung benutzt werden, der müsste jedoch für alle Hosts erreichbar sein, außerdem ändert sich dieser bei jedem Neustart des Prozesses oder des Hosts. Im Internet Modell hat man sich jedoch für die Einführung von Ports entschieden. Ein Prozess kann auf einen festen Port announcen oder nach einem zufälligen Port fragen. \\
-            Eine Application ist dann durch einen socket (IP:Port Kombination) erreichbar, wobei die IP die des Empfänger Hosts und die Port Nummer die der Empfänger Application ist. Es gibt gewissen Ports, die für Anwendungen reserviert sind a.k.a. ''well-known'' Ports (IANA: 0-1023). Beispiele sind 22/tcp für ssh, 25/tcp für smtp oder 443/tcp für https. Prozesse die solche Ports öffnen wollen brauchen in der Regel root Privilegien. \\ 
-            Um demultiplexing im Internet zu nutzen, empfängt der Host ein IP Datagram, bestehend aus source und destionation Socket. Diese Datagrams transportieren je ein Transport-Layer segment als Application Data. Das Problem hierbei: Wenn IP eines Tages ersetzt wird, funktionieren TCP/UDP nicht mehr, da die Nutzung von IP:Port hard in die implemtierung gecoded sind. 
-    
-    \subsection{Connection Controll}
-        Connection Control funktioniert natürlich nur bei CO Protokollen, in unserem Beispiel also nur TCP. Wie schon in Kapitel 1 angeschnitten, gibt es 3 Phasen der einer connection:
-        \begin{itemize}
-            \item CONNECT (herstellen der Verbindung)
-            \item DATA (Transfer von Daten)
-            \item DISCONNECT (Schließen der Verbindung)
-        \end{itemize}
-        Um zwischen Network und Transport Layer Phasen zu unterscheiden, schreibt man dort jeweils ein N-- bzw. T- Prefix zu den Phasen also z.B. T-Connect oder N-Data.
+		\paragraph{Sockets and Ports} 
+			Das OSI Modell sieht für die Kommunikation zwischen Programmen und zur identifizierung dieser die Nutzung von lokalen CEPs vor. In Systemen könnte der System PID zur identifizierung benutzt werden, der müsste jedoch für alle Hosts erreichbar sein, außerdem ändert sich dieser bei jedem Neustart des Prozesses oder des Hosts. Im Internet Modell hat man sich jedoch für die Einführung von Ports entschieden. Ein Prozess kann auf einen festen Port announcen oder nach einem zufälligen Port fragen. \\
+			Eine Application ist dann durch einen socket (IP:Port Kombination) erreichbar, wobei die IP die des Empfänger Hosts und die Port Nummer die der Empfänger Application ist. Es gibt gewissen Ports, die für Anwendungen reserviert sind a.k.a. ''well-known'' Ports (IANA: 0-1023). Beispiele sind 22/tcp für ssh, 25/tcp für smtp oder 443/tcp für https. Prozesse die solche Ports öffnen wollen brauchen in der Regel root Privilegien. \\ 
+			Um demultiplexing im Internet zu nutzen, empfängt der Host ein IP Datagram, bestehend aus source und destionation Socket. Diese Datagrams transportieren je ein Transport-Layer segment als Application Data. Das Problem hierbei: Wenn IP eines Tages ersetzt wird, funktionieren TCP/UDP nicht mehr, da die Nutzung von IP:Port hard in die implemtierung gecoded sind. 
+	
+	\subsection{Connection Controll}
+		Connection Control funktioniert natürlich nur bei CO Protokollen, in unserem Beispiel also nur TCP. Wie schon in Kapitel 1 angeschnitten, gibt es 3 Phasen der einer connection:
+		\begin{itemize}
+			\item CONNECT (herstellen der Verbindung)
+			\item DATA (Transfer von Daten)
+			\item DISCONNECT (Schließen der Verbindung)
+		\end{itemize}
+		Um zwischen Network und Transport Layer Phasen zu unterscheiden, schreibt man dort jeweils ein N-- bzw. T- Prefix zu den Phasen also z.B. T-Connect oder N-Data.
 
-        \subsubsection{Phases}  
-            Die verschiedenen Schritte können confirmed oder unconfirmed ablaufen. T-Connect wird immer confirmed, T-Data wird unconfirmed übertragen (in seltenden Fällen kann das auch confirmed laufen) und T-Disconnect können confirmed und unconfirmed ablaufen. Ein Beispiel für ein Ablauf ist auf 4:20 zu finden. Auch ein State-Diagramm, dass die Übergänge zu verschiedenen State beschreibt ist auf 4:24 enthalten.
+		\subsubsection{Phases}  
+			Die verschiedenen Schritte können confirmed oder unconfirmed ablaufen. T-Connect wird immer confirmed, T-Data wird unconfirmed übertragen (in seltenden Fällen kann das auch confirmed laufen) und T-Disconnect können confirmed und unconfirmed ablaufen. Ein Beispiel für ein Ablauf ist auf 4:20 zu finden. Auch ein State-Diagramm, dass die Übergänge zu verschiedenen State beschreibt ist auf 4:24 enthalten.
 
-            \paragraph{Establishment}
-                Beim T-Connect gibt es mehrere Methoden, die aufgerufen werden (können)
-                \begin{itemize}
-                    \item T-Connect.Request(Destination Address, Source Address)
-                    \item T-Connect.Indication(Destination Address, Source Address)
-                    \item T-Connect.Response(Responding Address)
-                    \item T-Connect.Confirmation(Responding Address)
-                \end{itemize}
-                Wobei die Destination Address die Addresse des Transport Service Users ist, also die Addresse die zum Transport gerufen wird. Die Source Address ist die Addresse des aufrufenden Service Users und die Responding Address die Addresse des Antwortenden Service Users. 
+			\paragraph{Establishment}
+				Beim T-Connect gibt es mehrere Methoden, die aufgerufen werden (können)
+				\begin{itemize}
+					\item T-Connect.Request(Destination Address, Source Address)
+					\item T-Connect.Indication(Destination Address, Source Address)
+					\item T-Connect.Response(Responding Address)
+					\item T-Connect.Confirmation(Responding Address)
+				\end{itemize}
+				Wobei die Destination Address die Addresse des Transport Service Users ist, also die Addresse die zum Transport gerufen wird. Die Source Address ist die Addresse des aufrufenden Service Users und die Responding Address die Addresse des Antwortenden Service Users. 
 
-            \paragraph{Data Transfer}
-                \begin{itemize}
-                    \item T-Data.req(userdata)
-                    \item T-Data.ind(userdata)
-                \end{itemize}
-                Die userdata ist dabei die Payload, die von der Application transportiert werden soll. 
+			\paragraph{Data Transfer}
+				\begin{itemize}
+					\item T-Data.req(userdata)
+					\item T-Data.ind(userdata)
+				\end{itemize}
+				Die userdata ist dabei die Payload, die von der Application transportiert werden soll. 
 
-            \paragraph{Connection Release}
-                Der Grund für einen Disconnect kann verschieden sein. Es kann zu einem Release kommen durch abruptes verlieren der Verbding oder als Folge des Connects. Das verlieren von TSDUs (T + SDU) ist möglich.
-                \begin{itemize}
-                    \item T-Disconnect.req(userdata)
-                    \item T-Disconnect.ind(cause, userdata)
-                \end{itemize}
-                Der cause für einen Disconnect kann z.B. ein request vom remote User, Quality of service below minimum, error oder auch unknowm sein. Beispiele für Abläufe verschiedener teardowns sind auf 4:23 zu finden. 
+			\paragraph{Connection Release}
+				Der Grund für einen Disconnect kann verschieden sein. Es kann zu einem Release kommen durch abruptes verlieren der Verbding oder als Folge des Connects. Das verlieren von TSDUs (T + SDU) ist möglich.
+				\begin{itemize}
+					\item T-Disconnect.req(userdata)
+					\item T-Disconnect.ind(cause, userdata)
+				\end{itemize}
+				Der cause für einen Disconnect kann z.B. ein request vom remote User, Quality of service below minimum, error oder auch unknowm sein. Beispiele für Abläufe verschiedener teardowns sind auf 4:23 zu finden. 
 
-        \subsubsection{Error Control}
-            \paragraph{Error Handeling in CONNECT}
-                Bleibt ein T-connect.req (CR) unbeantwortet, es kommt also zu einem Timeout, sendet der Host einfach erneut ein CR. Kommt das erste CR jedoch doch nur verspätet beim Empfänger an, und dieser Antwortet auf das erste CR mit einem CC (Connection confirmation) und bekommt dann das zweite CR, sollte durch einbeziehung des Application Layers der zweite CR unbeantwortet bleiben. Was passiert jedoch, wenn das CC verloren geht und wie geht man damit um? Denn der Empfänger (sender of CC) erwartet jetzt einen Datenaustausch. Eine Lösung wäre hier der Three-Way-Handshake
+		\subsubsection{Error Control}
+			\paragraph{Error Handeling in CONNECT}
+				Bleibt ein T-connect.req (CR) unbeantwortet, es kommt also zu einem Timeout, sendet der Host einfach erneut ein CR. Kommt das erste CR jedoch doch nur verspätet beim Empfänger an, und dieser Antwortet auf das erste CR mit einem CC (Connection confirmation) und bekommt dann das zweite CR, sollte durch einbeziehung des Application Layers der zweite CR unbeantwortet bleiben. Was passiert jedoch, wenn das CC verloren geht und wie geht man damit um? Denn der Empfänger (sender of CC) erwartet jetzt einen Datenaustausch. Eine Lösung wäre hier der Three-Way-Handshake
 
-            \paragraph{Three-Way-Handshake}
-            %4:26
-
-                
+			\paragraph{Three-Way-Handshake}
+				
+				

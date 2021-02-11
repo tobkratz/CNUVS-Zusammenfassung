@@ -120,4 +120,47 @@
 			Der erste Typ ARQ war das Alternating Bit Protocol. Das lässt sich jedoch weiter verbessern: Go-back-N. Geht ein Packet z.B. mit der Sequence Number 2 verloren oder löst ein Error aus, sendet der Empfänger kein ACK für diesen Frame. Er sendet jedoch weiter die Folge Frames (z.B. 3-8), dessen Frames vom Empfänger Link jedoch weggeworfen werden, da dieser noch auf den Frame mit der Seq. Number 2 warten. Timeoutet dann der Frame2, wird dieser erneut vom Sender gesendet. der Empfänger empfängt diesen Frame korrekt und sendet dann ein ACK. währenddessen sendet der Sender die Folge Frames von 2 (3-8) ebenfalls nochmals da diese auch kein ACK bekommen haben. (Beispiel siehe 4:49). \\ Eine Adaption dieses Protokolls wäre, wenn der Empfänger nicht auf den Timeout wartet, sondern für den fehlerhaften Frame ein NACK sendet. Dieser Frame wird dann erneut gesendet, in der Zeit buffert der data link des Empfängers Frames mit dn folgende seq. Number.
 
 	\subsection{Congestion Control}
-		%4:51
+		Bei Kommunikation zwischen zwei Hosts gibt es immer ein Bottleneck, dass die Geschwindigkeit beschränkt. Ein Netz ist dann auf genau dieses Bottleneck beschränkt. Werden mehr Daten gesendet, als das Bottleneck übertragen kann, kommt es zu einem congestion collapse. Bei solch einem collapse gehen viele Packete verloren und die Effizienz sinkt unter das Bottleneck. Je nachdem wo das Bottleneck ist, kann sich das ganze auch in sich selbst steigern, ist z.B. der Router durch den Buffer Space beschränkt und es kommt zu einem collapse wobei der Sender ein Protokoll nutzt, dass nicht angekommene Packete nochmal sendet, wird der Router mit einer noch größeren Flut an Packeten überschwemmt.
+		Im folgenden sind $\lambda_{in}$ die Daten die Host A versendet und $\lambda_{out}$ die, die Host B empfängt. Im Idealfall ohne Packetverlust ist $\lambda_{in}=\lambda_{out}$
+		\paragraph{Scenario 1}
+			Wir gehen von einem Router mit umbegränztem Buffer aus und Packete werden nicht neu versendet. Die Throughput steigt bis zum Maximum an, bleibt dann stabil, der Delay steigt exponentiell an, wenn es zu einer congestion kommt.
+		
+		\paragraph{Scenario 2}
+			Hat der Router jedoch einen beschränkten Buffer und Host A sendet nicht bestätigte Packete nach einiger Zeit nochmal. Host A sendet jetzt $\lambda'_{in}=\lambda_{in}$+ retransmitted packages. Perfekt wäre nur wirklich verloren gegangene Packete neu gesendet werden, $\lambda'_{in}$ wäre $>\lambda_{out}$. Werden nicht wirklich verlorerene Packete neu gesendet, wird $\lambda'_{in}$ hörher als nötig. 
+
+		Wie bei den Scenarien gemerkt, wird congestion controll esentiell, um einen Schneeball Effekt zu verhindern. 
+		
+		\subsubsection{solving congestion Control}
+			Eine Globale Lösung wäre, die Sende Rate an den Bottleneck anzupassen. Das kann jedoch nur gloabl passieren und jeder Router müsste seine Maximal Kapazität bekanntgeben. Diese Lösung macht das Problem nur komplizierter und kleine Konfigurationsfehler können das gesamte System betreffen. Deswegen wird Congestion Control zu einem lokalen Problem gemacht. Meistens wird es zwischen Sender um Empfänger gelöst. 
+			Das Ziel ist es, so viele Packete wie möglich zu verschicken, ohne jedoch die Leitung zu verstopfen. Außerdem sollte Congestion Control Fair ablaufen, jedoch unter welchen Bedingungen? Ein 3-Hop Weg ist genausoviel Wert wie 3 1-Hop ways? Priorisierung in Anwendungen (Video Call > Downloads)? 
+
+			\paragraph{Design Options for Congestion Control}
+				Es gibt 2 fundamentale Anstätze, Congestion Control zu gewährleisten:
+				\begin{itemize}
+					\item Closed-Loop - Der Sender bekommt Feedback über das aktuelle Verhalten und kann die Kapazität anpassen. 
+						\begin{itemize}
+							\item implementierung am Sender
+							\item implementierung am Empfänger
+						\end{itemize}
+					\item Open-Loop - Das System von vorne herein funktioniert und keine Korrekturen im Betrieb notwenig sind.
+						\begin{itemize}
+							\item explicit Feedback - Im Fall wenn es passiert, den Sender Informieren
+							\item implizit Feedback - Der Sender passt die Rate selbst an ohne direktes Feedback vom Empfänger sondern durch Daten aus dem Betrieb (z.B. ausbleibende ACKs). Beispeil: TCP
+						\end{itemize}
+				\end{itemize}
+			
+			\paragraph{Possible Actions}
+				Um Netze vor Congestion zu schützen, gibt es andere alternativen als einfach den Traffic zu pausieren. Um häufige Congestions entgegen zu wirken, kann die Netz Kapazität z.B. durch mehr Router erhöht werden. Auch kann ein Router das allocieren von zusätzlichem Traffic einschränken, wenn das Netz schon fast ausgelastet ist, jedoch sind Informationen über den Netzwerk state selten Verfügbar. Ebenso können alle Session einen Teil der Verfügbaren Load reduzieren, um allgemein mehr Kapazität zu schaffen. Dafür wird jedoch Netzwerk Feedback benötigt, das geht also nur in closed-loops. \\
+				Die Klassifizierung der Packete kann Zentral am Router oder am Host stattfinden. Im Internet geschieht das (außer beim droppen von Packeten) am End-Host. Die einzelnen Klassen bekommen entweder einen gewissen Byte Betrag pro Sekunde (rate based) oder eine gewisse Anzahl an Sequence Numbers/Bytes im Netz verarbeitet werden dürfen (Es gibt auch andere, jedoch unpopulärere Methoden z.B. Credit Based Congestion Control). \\
+			
+			\paragraph{Package Dropping}
+				Ensteht ein collapse durch einen vollen Router Buffer, müssen Packete aus diesem gedroppt werden, doch welche? Eine Methode ist die drop-tail queue, bei dir das neuse Packet weggeworfen wird. Das spielt z.B. gut mit dem go-back-n Protokoll zusammen. Für andere Anwendungen, z.B. Telefon sind neue Packete wichtiger als alte, hier würden am besten Packete gedroppt, die schon lange in der Queue sind. Eine solche Aktion ist auch immer, ein implizites Feedback. Der Sender erkennt das nicht ankommen des Packets. Ensteht eine Congestion durch einen vollen Buffer, muss der Traffic verringert werden. 
+			
+			\paragraph{proactiv Actions}
+				Prinzipiell ist ein Router nicht mehr in der Lage, richtig zu funktionieren, wenn er einmal eine volle Queue hat, es sollte also um jeden Preis vermieden werden, z.B. indem man bereits bei z.B. 90\% einen warning state Aufruft. Eine andere Methode ist das Chocke Packet. Ein Router mit vollen Buffer sendet so ein solches Packet an den Sender, dass diesem sagt, die Rate zu verringern. Das Problem ist jedoch, in einem congested Netz gehen mehr Packete verloren als sonst, es kann also sein, dass der Sender ein solches Packet nie erhält. Auch kann ein Router statt ein extra Packet zu senden, ein warning Bit in allen ausgehenden Packeten setzen, dass allen Hosts sagt, dass der Router überlastet ist, oder das kurz bevor steht. Eine vielleicht etwas radikalere Lösung ist die Random Early Detection (RED), die mit einer Rate zufällig Packete droppt, auch wenn der Router noch nicht überlastet ist, um diesen genau davor zu schützen. Diese Rate je nach Anzahl Packete im Buffer variieren. 
+
+			\paragraph{Feedback Actions}
+				Sobald ein Sender Informationen über eine congestion erreicht hat, muss der Traffic reduziert werden. Doch wie das geschieht, hängt von den Protokollen des Transport Layers ab.
+
+	\subsection{UDP}
+		%4:73

@@ -232,5 +232,56 @@
 			Ein Empfänger nutzt diese 4 Tupel um ein Packet/Segment dem richtigen Socket zuzuweisen. WEbserver haben z.B. für jede Verbindung zu einem client einen eigenen Socket. Gewisse Webserver können auch für jede HTTP Anfrage einen eigenen Socket brauchen. 
 
 		\subsubsection{Error \& Connection Control in TCP}
+			Sequence Numbers werden bei TCP genauso wie ACKs genutzt. Ein ACK gibt dabei die Sequence Number des nächsten erwarteten Packets an. Ein Beispiel für einen Ablauf ist auf 4:87. \\
+			Um TCP timeouts richtig einzustellen, also die Zeit bis zu einem timeout, gibt es einige Faktoren zu beachten. Der Timeout darf nicht kleiner als die Round Trip Time (RTT) sein, sonst kommt es zu unnötigen retransmission, sie darf jedoch auch nicht zu lange sein, sonst kommt es zu unnötig langen verzögerungen beim neusenden von Packeten. Die RTT kann man z.B. berechnen, indem man die Zeit ziwschen senden eines Packets und ankommen des ACKs misst. Dieses verfahren nennt man SampleRTT. Da das von Packet zu Packet varrieren kann, kann man das Ergebnis durch runden mehrerer Rechnungen glätten. \\
+			TCP Connections können aktiv oder passiv hergestellt werden:
+			\begin{itemize}
+				\item \textbf{Active Mode:} Ein Host fragt eine Connection bei einem anderem Host an. 
+				\item \textbf{Passive Mode:} Eine Anwenung Informiert TCP, dass sie auf einem Socket connections annimmt. Es kann jedoch auch Port unspeziefisch sagen, dass alle eingehenden Verbindungen akzeptiert werden. Sobald eine Verbindung eingeht, wird ein neuen Socket aufgemacht, der als Endpunkt für die Verbindung gilt. 
+			\end{itemize}
+			Der Ablauf einer TCP Connection ist auf 4:90 Beispielhaft aufgeführt, außerdem sind auf 4:91 \& 4:92 Szenarien aufgeführt, wie sich TCP in einigen Fällen verhält, wenn ACKS ausbleiben, nach timeouts ankommen oder anderes. 
 
-		
+			\paragraph{Fast Retransmit}
+				Geht ein Packet verloren, kann es lange dauern, bis der timeout ausläuft, und das Packet neu gesendet wird. Eine Lösung für dieses Problem ist Fast Retransmit. Erhält ein Sneder aufeinanderfolgend 3 mal das gleiche ACK, da zwar nachfolgende Packete angekommen sind, der Empfänger jedoch noch das verlorene Packet erwartet sendet TCP schon vor einem timeout das Packet neu. Das ist guter Kompromiss ziwschen nicht unnötig lange warten und nicht unnötig Packete versenden. 
+			
+			\paragraph{Send and Receive Buffers in TCP}
+				TCP pflegt jeweils auf Sender und Empfänger Seite einen Buffer um beim Sender Packete zu speicher, die z.B. noch nicht geackt sind, um diese ggf. neu zu senden oder Daten der Application zu speichern, bevor diese versendet werden. Ältere Versionen von TCP haben nach dem Go-Back-N Prinzip gearbeitet und out-of-order Packete weggeworfen. Inzwischen werden auf Empfänger Seite Packete, die neuer als erwartet sind ziwschengespeichert, um nicht alle neu senden zu müssen. 
+
+		\subsubsection{Flow \& congestion Control in TCP}
+			In TCP kann der Empfänger den advertise size von seinem Buffer announcen. Der Buffer size ist dabei: 
+			\begin{quote}
+				Advertised window = MaxRcvdBuffer–((NextByteExpected-1) –LastByteRead)
+			\end{quote}
+			der advertiste Speicher beschränkt dabei den Sender in der Anzahl an Daten, die dieser verschickt. Der Sender achtet dabei darauf, dass 
+			\begin{quote}
+				LastByteSent–LastByteAcked $\le$ AdvertisedWindow
+			\end{quote}
+			bzw. \begin{quote}
+				EffectiveWindow = AdvertisedWindow–(LastByteSent–LastByteAcked)
+			\end{quote}
+			
+			\paragraph{Self Clocking Winwo}
+				Bisher gingen wir davon aus, dass neue Packete diregt verschickt werden, wenn ein ACK eingetroffen ist. Problem jedoch, wenn ACKs schneller einkommen, als die Application Daten in den send Buffer schreibt, werden viele kleine Packete verschickt. Man spricht dabei vom \frQuo silly window syndrom\frQuc. Eine Lösung hierfür ist Nagle's Algorithmus. \\
+				Wenn die Verfügbaren Daten und das advertiste Window $\ge$ MSS sind, wird ein volles Segment verschickt. Ansonsten wird geschaut, ob bereits an Packet verschickt wurde, das noch ncith geACKt wurde, dann wird gewartet bis MSS voll ist. Falls kein Packet verschickt ist, werden die neuen Daten sofort verschickt. 
+			
+			\paragraph{Congestion Control}
+				TCP kontrollliert arbeitet mit implicit feedback um congestion zu verhindern, konkret mit der Information über dropped Packages. Es kann weiter nicht unterschiden werden, warum Packete gedroppt werden, deswegen wird davon ausgegangen, dass diese wegen congestion gedroppt wurden. TCP ermittelt mit diesen ein congestion window, dass im laufenden Betrieb reflektiert und aktualisiert wird. Zusätzlich zu den Limits der Flow Control beschränkt der Sender die Anzahl an Packeten durch 
+				\begin{quote}
+					LastByteSent-LastByteAcked $\le$ CongWin
+				\end{quote}
+				Um die darstellung von congestion Control zu vereinfachen, wird in Zukunft das flow Control Window ignoriert. \\
+				Hat TCP jetzt genau so viele Packete in das Netzwerk gesendet, wie das congestion Window erlaubt, wird gewartet, bis diese das Netz wieder verlassen haben. Durch das erreichen von ACKs ist sichergestellt, dass die Packete nicht mehr im Netz sind und es können neue gesendet werden. 
+			\paragraph{Congestion Window (AIMD)}
+				Bekommt TCP ein ACK, geht es nach Greedy von der Annahme aus, dass das Netz noch Kapazität hat und erhöht das congestion window. Bleiben jedoch ACKs aus und es kommt zu einem timeout, wird das congestion window verkleinert. Doch um wieviel? Um das Netz vor einem congestion collapse zu schützen, müssen drastische Maßnahmen getroffen werden, und das congestion window wird auf 50\% gekürzt (halbiert)! Das Window kann jedoch nie kleiner als 1 sein. \\
+				Das kürzt jedoch die nehr als nötig, wenn Packete nicht wegen congestion, sondern z.B. durch Übertragungsfehler gedroppt werden. Das passiert in physischen Netzen selten, ist jedoch grade bei Mobilen Netzen ein Problem. Das ganze nennt sich mupliplicative decrease. \\
+				Wird jedoch das Congestion Window durch ACKs erhöhrt, wird es nicht so stark erhöht, da es sonst zu einem collapse kommt. TCP testet sich langsam an das Maximum heran und erhöht es immer nur um einen kleinen Teil. Wenn alle gesendeten Packete innerhalb der RTT (Round Trip time) ein ACK erhalten haben, sendet TCP in Zukunft ein Packet mehr pro RTT. \\
+				Das ganze kann auch per additive increase passieren, dabei wird das Congestion Window pro erreichtes ACK um folgenden Wert erhöht:
+				\begin{quote}
+					Congestion Window += MSS x (MSS / Congestion Window)
+				\end{quote}
+				TCP setzt insgesamt auf ein AIMD (adaptive increase multiplicative decrease) ''Sägezahn'' Pattern. (Beispiel siehe 4:105). AIMD start jedoch mit einem congestion Window von 1 oder 2 und brauch länger, um anzulaufen, was gerade bei schnellen Netzen unnötigt Zeit kostet. Es kann also anfangs das congestion Window z.B. je ACK verdoppelt werden, bis es einmal durch loss halbiert wird. Ab diesem Punkt wird dann auf linearen anstieg umgestellt. 
+			\paragraph{Packet Burst}
+				Ein Problem jedoch: Ein Packet geht verloren. Nach einem timout wird das Packet neu gesendet und es kommt ein ACK zurück. Packete wurden seit dem timeout zurückgehalten und das congestion window zwar halbiert. jedoch wird jetzt auf einmal das gesamate (halbierte) Congestion Window auf einmal ausgeschöpft und ein ''Packet Sturm'' losgeschickt. Dadurch wird es wahrscheinlich zu einem hohen Packetverlust kommen. Die Lösung ist, in dem Fall wieder slow zu starten mit einem congestion window von 1. Jedoch gibt es jetzt eine Idee von der maximalen Größe des Congestion Windows. Dieser wird kann also congestion threshold genutzt werden. Es wird also mit dem exponentiellen slow start bis zum threashold increased und dann auf additive increase gewechselt. \\
+				Ein Beispiel Ablauf ist auf 4:111.
+	
+	\subsection{Other Protocols}

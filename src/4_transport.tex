@@ -285,3 +285,16 @@
 				Ein Beispiel Ablauf ist auf 4:111.
 	
 	\subsection{Other Protocols}
+		Da der Multimedia, vorallem Video, streaming in den letzten Jahren stark zugenommen hat, wird mehr auf Protokolle, die auf UDP Basis aufbauen gesetzt. Der meiste Traffic geschieht trotzdem größtenteils mit TCP, andere Protokolle z.B. QUIC sind auf dem vormarsch. 
+
+		\subsubsection{SCTP}
+			Das Stream Control Transmission Protocol (SCTP) Protokoll ist message-Oriented (wie UDP), hat jedoch wie TCP flow, congestion und error control implementiert. Jede Nachticht in einem Stream erhält dabei eine sequence Number, um Packete zu ordern. Ein Empfänger kann dabei ordering ordering und reliability an und ausschalten, ebenso fragmentation und Nagle. Außerdem können mehrere Streams in einer einzelenen Verbindung gehandelt werden und beide Endpunkt können mehrere IP Addresses nutzen (failover).
+		
+		\subsubsection{DCCP}
+			DCCP (DatagramCongestionControl Protocol) ist im Kern etwa wie TCP nur ohne bytestream semantik und reliability oder wie UDP mit congestion Control, Handshakes und optionalen ACKs. Es ist CO. Durch seperate Header und Data checksums ist es nicht zuverlässig und wird selten genutzt. Es besteht keine große Chance, dass es weitfläufig genutzt wird.
+		
+		\subsubsection{RTP/RTCP}
+			RTP (Real-time Transfer Protocol) ist gedacht als realtime multimedia Protokoll. RTP Session Data unterstützt sequence Number und timestams, encryption und Informationen über den Payload inhalt. Ähnlich wie QUIC läuft RTP auf Basis von UDP. Dabei unterstützt die RTP library für den Application Layer Funktionen wie Port numbers and IP Addressen, Payload type identifizierung, Packet sequence numbering und time-stamping. 
+		
+		\subsection{QUIC}
+			QUIC (Quick UDP Internet Connections) wurde von Google entwickelt, ist inziwschen aber in IETF Standarts eingearbeitet. 2017 machte es bereits etwa 7\% des globalen Traffics aus. Durch schnelles connection setup and secutiry mit TSL1.3 wird es besonders attraktiv gemacht. Es unterstützt außerdem error forwading.

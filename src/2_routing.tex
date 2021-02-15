@@ -96,7 +96,7 @@
 
 		\subsubsection{Count to Infinity Problem} 
 			Gegebene Situation: Wir haben 3 Host A,B,C. A ist mit B mit einem Cost von 1 verbunden, und B ist mit C mit einem Cost von 2 verbunden. Daraus ergeben sich folgende 3 Routing Tabellen:
-			\begin{table}[h]
+			\begin{table}[ht]
 				\centering
 				\begin{tabular}{|lll|lll|lll|}
 				\hline
@@ -111,7 +111,7 @@
 				\end{tabular}
 			\end{table}
 			Durch einen Ausfall verschwindet jetzt die Verbindung zwischen B und C. A announced an B jedoch, dass es eine Route zu C mit dem Cost von 3 gibt. B versucht nun also C via A zu erreichen:
-			\begin{table}[h]
+			\begin{table}[ht]
 				\centering
 				\begin{tabular}{|lll|lll|lll|}
 				\hline
@@ -140,7 +140,7 @@
 
 		\paragraph{Vergelich LSR und DVR}
 		Link State Routing und Distance Vecotr Routing im direkten Vergleich:
-		\begin{table}[h]
+		\begin{table}[ht]
 			\resizebox{\textwidth}{!}{%
 			\begin{tabular}{|l|l|l|}
 			\hline

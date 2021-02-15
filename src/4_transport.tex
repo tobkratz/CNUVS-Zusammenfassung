@@ -165,7 +165,7 @@
 	\subsection{(Internet) UDP}
 		\paragraph{RFC 768} 
 			UDP ist eine Best Effort Lösung für Packetübertragung im Internet. UDP ist connectionless, es gibt also keine Handshakes zwischen sender \& Empfänger. UDP Packete können verloren gehen und ohne congestion Control einfach ''in die Welt'' geblasen werden. UDP wird für z.B. Streaming benutzt, wo es nicht so schlimm ist, wenn ein Packet mal wegfällt, aber auch DNS Anfragen oder SNMP setzten auf UDP. In-Oder delivery oder reliability können auf dem Application Layer implementiert werden. Ein UDP Segment ist wie folgt aufgebaut:
-			\begin{table}[h]
+			\begin{table}[ht]
 				\centering
 				\begin{tabular}{|l|l|l|l|l|l|l|l|}
 				\hline
@@ -194,7 +194,7 @@
 				\item \textbf{Flow \& congestion Control} In TCP sind implementierungen für diese beiden Ansätze vorhanden
 			\end{itemize}
 			Ein TCP Segment hat dabei den volgenden Aufbau:
-			\begin{table}[h]
+			\begin{table}[ht]
 				\centering
 				\begin{tabular}{|c|l|l|l|l|l|l|l|c|l|l|l|l|l|l|l|}
 				\hline

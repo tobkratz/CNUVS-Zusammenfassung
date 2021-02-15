@@ -10,7 +10,7 @@
 	Sendet ein Host A ein Datenpacket via IP an Host B, versieht A dieses Packet mit einer einer Destionation Addresse. Dieses Packet wird dann von Routern weitergeleitet, bis es an ziehl kommt.  Ein Beispiel um Routing mit IP zu erklären: \\ Host A (192.0.0.1) sendet ein Packet an 192.0.1.1. Host A hat jedoch keine direkte Verbindung sondern ist mit einem Router verbunden, der die Addresse 192.0.0.1 hat. In einer Routing Tabelle dieses Routers gibt es z.B. folgende Einträg: 192.0.0.0/24  über Link Interface 1 und 192.0.1.0/24 über Link Interface 2. Bekommt der Router also ein Packet mit der Destionation Addresse 192.0.1.1, so ist diese in der zweiten Range drin, und er sendet das Packet über Link 2 weiter. \\ Die Information über die Destionation IP steht im IP Header.
 
 	\subsection{IP Header}
-		\begin{table}[h]
+		\begin{table}[ht]
 			\centering
 			\caption{IP Header, length: \textless{}-- 32 bits  --\textgreater{}}
 			\label{tab:my-table}
@@ -39,7 +39,7 @@
 	\subsection{Addressing}
 		In den bisher kennengelernten Routing Algorithmen speicher der Router Addressen in einer Tablle, mit dem entsprechenden Pfad, den er dorthin routet. In großen Netzen kann dann so eine Tabelle sehr schnell sehr groß werden. Außerdem ist es nicht unüblich, dass eine Gerät mehrere (MAC) Addressen hat, da eine MAC-Addresse nicht Host spezifisich ist, sondern Interface speziefich. 
 		
-		\begin{table}[h]
+		\begin{table}[ht]
 			\centering
 			\begin{tabular}{|l|l|l|}
 				\hline
@@ -92,7 +92,7 @@
 		\end{itemize}
 		\paragraph{IPv6 Header}
 			Im Vergleich zum IPv4 Header fallen einige Feleder weg. 
-			\begin{table}[h]
+			\begin{table}[ht]
 				\centering
 				\caption{IPv6 Header, length: \textless{}-- 32 bits  --\textgreater{}}
 				\label{tab:my-table2}
@@ -108,7 +108,7 @@
 
 		\paragraph{IPv6 Addresses}
 			v6 Addressen werden als 8x16 Bit Blöcke in hex Nummern geschrieben, wobei mit :: alles mit 00 gefüllt wird. Beispiel: fd42:4242:f31a:: = fd42:4242:f31a:0000:0000:0000:000:0000. Es kann auch genutzt werden um Blöcke aufzufüllen, z.B fd42:4242:f31a::abba = fd42:4242:f31a:0000:0000:0000:0000:abba. Die 128 Bits einer IPv6 Addresse sind wie folgt aufgeteilt:
-			\begin{table}[h]
+			\begin{table}[ht]
 				\centering
 				\begin{tabular}{llllll}
 				3 &

@@ -1,9 +1,106 @@
 \section{Queueing Theory}
-Beim Queueing gibt es 5 wesentliche Punkte:
-\begin{enumerate}
-	\item Arival Process: How do customers/requests arrive?
-		\begin{itemize}
-			\item Typically described as probability distribution of interarrival times
-			\item $A(t) = P[time between arrivals \le t]$
-		\end{itemize}
-\end{enumerate}
+	Beim Queueing gibt es 5 wesentliche Punkte:
+	\begin{enumerate}
+		\item Arival Process: How do customers/requests arrive?
+			\begin{itemize}
+				\item Typically described as probability distribution of interarrival times
+				\item A(t) = P[time between arrivals $\le$ t]
+			\end{itemize}
+		\item Service Process: Wie viel Nachfragen werden pro Anfrage generiert?
+			\begin{itemize}
+				\item Service time B(x) = P[service time $\le$ x]
+			\end{itemize}
+		\item Wie viel Platz ist in einer Queue
+		\item Wie viele Server stehen zur Verfühgung
+		\item Nach welcher policy werden Afragen verabreiter
+			\begin{itemize}
+				\item FCFS (First come first servere), shortest job first, priority queue?
+			\end{itemize}
+	\end{enumerate}
+	Außerdem werden in diesem Kapitel die folgenden Notationen genutzt:
+	\begin{itemize}
+		\item $C_n$ ist der nte job/task (costumers), der dass System betritt
+		\item $\alpha(t)$ = Anzahl der \textbf{arrivals} innerhalb $[0,t)$
+		\item $\delta(t)$ = Anzahl der \textbf{departures} innerhalb $[0.t)$
+		\item $N(t)$ = Anzahl der costumers im System zu der Zeit $N(t): \alpha(t)-\delta(t)$
+		\item $\tau_n$ = Ankunftszeit des costumers $C_n$
+		\item $t_n$ = Zeit zwischen $C_n$ und $C_{n-1}=\tau_n-\tau_{n-1}$ 
+			\begin{itemize}
+				\item $P[t_n\le t] = A(t)$
+				\item Vergleiche \textbf{arrival rate = $\lambda$} wobei $\lambda = \lim_{t \to \infty} \frac{a(t)}{t}$
+			\end{itemize}
+		\item $x_n$ = service Zeit für $C_n$
+			\begin{itemize}
+				\item $P[X_n \le x] = B(x)$
+				\item vergleiche: service rate = $\mu$ 
+			\end{itemize}
+		\item $w_n$ = waiting time in der queue für $C_n$
+		\item $s_n$ = system time für $C_n = w_n + x_n$
+	\end{itemize}
+	Neben diesen gibt es noch einige besodere Notationen. Wobei $\overline{t}$ die durchschnittliche Zeit zwischen costumers ist.  
+	\begin{itemize}
+		\item $\overline{t} = \frac{1}{\lambda}$
+		\item $\overline{x} = \frac{1}{\mu}$
+		\item $\overline{w} = W$
+		\item $\overline{s} = T$
+	\end{itemize}
+
+	\subsubsection{Little's Law} 
+		Sei $N_t$ die durchschnittliche Anzahl an costumers innerhalb $[0,t)$ 
+		$$
+			N_t = \frac{1}{t} { \int_{0}^{t} N(\tau) \,d\tau } = \frac{\gamma(t)}{t}
+		$$
+		Mit $T_t = \frac{\gamma(t)}{\alpha (t)}$ und $\lambda_t = \frac{\alpha(t)}{t}$ erhalten wir $N_t = \lambda_tT_t$. Wenn $\lambda$ die durchschnittliche Ankunftsrate ist und wenn $\lim_{t \to \infty} T = T$  exisitiert, dann ist 
+		$$
+			N = \lambda T
+		$$ Little's law. 
+		Die durchschnittliche Anzahl an costumers im System ist äquivalent zu der durchschnittlichen Rate an eingehenden costumers mal die durchschnittliche Zeit, die diese im System sind. 
+	
+	\subsubsection{Utilazation}
+		Der Utilazation Factor $\rho$ ist die Rate zwischen eintreffenden jobs und den jobgs, die das System verarbeitet. Für Systeme bestehend aus einem server: 
+		$$
+			\rho = \lambda / \mu = \lambda\overline{x}
+		$$ 
+		Normal ist $0 \le /rho < 1$
+
+	\subsection{Stochastic Process}
+		(wahrscheinlich nicht relefant)
+		Die bisherige Theorie des Queues ist determistisch, doch in der Theorie ist es weniger fest als mehr zufällig, da viele Faktoren mitspielen deren Berechnung schwierig ist. Stattdessen kann man Queues mit stochastischen Ansätzen berechnen. Ein Stochastic Process ist dabei eine Familie von zufälligen variablen $X(t)$, wobei die Variablen nach Zeit geindext werden. Die Processe lassen sich dabei folgendermaßen klassifizieren:
+		\begin{enumerate}
+			\item \textbf{State space:} Welche Werte kann $X(t)$ annehmen? Diskrete oder fortlaufende?
+			\item \textbf{Time parameter:} Ist die Zeit diskret oder fortlaufend? Falls Diskret können Änderungen nur an bestimmten Zeiten auftreten: $X(t) = X_n$
+			\item \textbf{Dependence between X(t)’s:} Konditionale wahrscheinlich (Abhängig vom vorherigen State). Order of dependence: $P[X(t_{n+1} \le x_{n+1} | X(t_n) = x_n,...,X(t_1)=x_1)]$
+		\end{enumerate}
+
+	\subsection{Birth-Death Process}
+		Beim Birht-Death Process können state Änderungen nur nach Nachbar Sates führen. Der aktuelle Status sei k, dann sind die möglichen Sati in der nächsten Iteration k-1, k oder k+1. Eine Transition von k zu k+1 nennt man birth, eine von k zu k-1 Death. In einem leeren System kann es zu einem birth, jedoch nicht zu einem death kommen. Die Birth-rate sei $\lambda_k$ und die Death-rate $\mu_k$ mit einer Populationgröße von k.  \\
+		Ein Process gilt als Birth-Death Process, wenn die folgenden 3 Eigentschaften erfüllt sind:
+		\begin{enumerate}
+			\item Der Process ist eine homogene Markov chain X(t) auf dem State 0,1,2...
+			\item Births and Death sind unabhängig
+			\item folgende Eigentschaften sind wahr
+				\begin{itemize}
+					\item $P[$1 birth in$ (t, t+\delta t) | $k in pop.$] = \lambda_k \delta t + o(\delta t)$
+					\item $P[$1 death in$ (t, t+\delta t) | $k in pop.$] = \mu_k \delta t + o(\delta t)$
+					\item $P[$ no birht nor death in $(t, t+\delta t) | $k in pop.$] = 1-(\lambda_k + \mu_k) \delta t + o(\delta t)$
+				\end{itemize}
+		\end{enumerate}
+		Alternativ lässt sich ein brith-death Process aus folgend darstellen:
+		\begin{center}
+		\begin{tikzpicture}[auto]
+			\node[state] (q0) {$0$};            
+			\node[state, right=of q0] (q1) {$1$};        
+			\node[state, right=of q1] (q2) {$2$};                                
+			\draw 
+				(q0) edge[->, loop above] node {} ()    
+					edge[->, bend left] node {$\lambda_1$} (q1)             
+				(q1) edge[->, loop above] node {} ()  
+					edge[->, bend left] node {$\mu_0$} (q0)  
+					edge[->, bend left] node {$\lambda_2$} (q2)   
+				(q2) edge[->, loop above] node {} () 
+					edge[->, bend left] node {$\mu_1$} (q1);
+		\end{tikzpicture}
+		\end{center}
+
+		\subsubsection{Poison Process}
+			%5:27

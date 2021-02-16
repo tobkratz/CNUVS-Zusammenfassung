@@ -1,4 +1,5 @@
 \section{Queueing Theory}
+	Tabelle mit Zusammenfassung der Queue Koefizienten für diverese Queues ist auf 5:43. 
 	Beim Queueing gibt es 5 wesentliche Punkte:
 	\begin{enumerate}
 		\item Arival Process: How do customers/requests arrive?
@@ -103,4 +104,131 @@
 		\end{center}
 
 		\subsubsection{Poison Process}
-			%5:27
+			Nehmen wir an, dass wir für einen Brith-Process ist $\mu_k=0\forall k$. Außerdem nehmen wir an, dass $\lambda_k = \lambda \forall k$. Setzen wir das in unsere Gleich ein, erhlaten wir: 
+			$$
+				\frac{dP_k(t)}{dt} = - \lambda P_k(t)+\lambda P_{k-1}(t) \forall	k\ge1
+			$$
+			$$
+				\frac{dP_0(t)}{dt} = - \lambda P_0(t) 			\forall			k=0
+			$$
+			Nehmen wir weiter an, dass wir im State $0,P_k(0)=1$ für $k=0$,$0$ für $k \ne 0$. Für $P_0(t)$ erhalten wir $P_0(t)=e^{-\lambda t}$. Mit $e^{-kx}dx = -k e^{-kx}$ erhalten wir $P_1(t) = \lambda te^{-\lambda t}$. Mit Induktion erhalten wir dann die Poisson distribution
+			$$
+				P_k(t) = \frac{(\lambda t)^k}{k!}e^{-\lambda t}
+			$$
+			Poison Process beschreibt dabei eine Sequenz von brith Epochen, die hauptsächlich vom Parameter $\lambda$ abhängig sind. Hier beschreibt Poison Process das eintreffen von costumers. DIe durchschnittliche Ankunftsrate in t ist dabei $E[k] = \lambda t$
+
+		\subsubsection{Equilibrium in Birht-Death Systems}
+			TODO 
+
+	\subsection{The M/M/1 Queueing System}
+		\subsubsection{Kendall's Notation}
+			Mit der Kendall Notation werden die verschiedenen Parameter des Systems angegeben. Die Notation hat das Format
+			\begin{quote}
+				A/S/m/N/K/SD 
+			\end{quote}
+			wobei 
+			\begin{itemize}
+				\item \textbf{A = Arrival process}
+				\item \textbf{S = Service Process}
+				\item \textbf{m = Number of servers}
+				\item N = Platz im System. Wenn nicht angegeben idR. $\infty$
+				\item K = Population Size  (in CNuvS wird nicht näher darauf eingegangen)
+				\item SD = Queue discipline. default = FCFS
+			\end{itemize}
+			Für A und S werden die folgenden Notationen verwendet:
+			\begin{itemize}
+				\item M = Exponentioneller Prozess (Markovian)
+				\item D = Determistisch
+				\item G = Generell
+				\item außerdem noch einige spezielle Fälle
+			\end{itemize}
+
+		\subsubsection{M/M/1}
+			M/M/1 ist das simplelste Queueing System. Konkret bedeutet das, Poisson Arrivals, exponential service auf 1 Server. Dabei ist $\lambda_k = \lambda_{k1} = \lambda_{k2} = \lambda_{k3} = \lambda$. Genauso für $\mu$. Das State Diagramm sieht dann wie folgt aus:
+			\begin{center}
+				\begin{tikzpicture}[auto]
+					\node[state] (q0) {$0$};            
+					\node[state, right=of q0] (q1) {$1$};        
+					\node[state, right=of q1] (q2) {$2$};                                
+					\draw 
+						(q0) edge[->, loop above] node {} ()    
+							edge[->, bend left] node {$\lambda$} (q1)             
+						(q1) edge[->, loop above] node {} ()  
+							edge[->, bend left] node {$\mu$} (q0)  
+							edge[->, bend left] node {$\lambda$} (q2)   
+						(q2) edge[->, loop above] node {} () 
+							edge[->, bend left] node {$\mu$} (q1);
+				\end{tikzpicture}
+			\end{center} 
+			Analog wäre dann der Brith-Death-Process die Anzahl Costumers im System, Birht das ankommen eines neues costumers (entweder in der Queue oder im System) und Death dass der Service geliefert hat und der costumer das System verlassen hat. 
+
+			\paragraph{M/M/1 Solutions}
+				Die wahrscheinlichkeit für ein Steady State in M/M/1 Systemen ist 
+				$$
+					p_k = p_0\prod_{i = 0}^{k-1}\rho = p_o \cdot \rho^k  
+				$$
+				wenn die Vorraussetzung $\lambda < \mu$ erfüllt ist mit $\rho \frac{\lambda}{\mu} <1$. Daraus lässt sich schließen, dass 
+				$$
+					p_k=(1-\rho)\rho^k
+				$$.
+				Die durchschnittliche Zeit von costumers im System ist bei M/M/1 
+				$$
+					\overline{N}=\frac{\rho}{1-\rho}=\frac{\lambda}{\mu-\lambda}
+				$$
+				Mit Little's Law lässt sich außerdem die durchschnittliche Zeit im System berechnen
+				$$
+					T=\frac{1/\mu}{1-\rho}=\frac{1}{\mu-\lambda}
+				$$
+				Wie sieht an den Formen ablesen lässt, steigen N und T für $\rho$ nah $1$ exponentiell an. 
+
+			\paragraph{M/M/1/N}
+				Auch diese Art ist mit Birth-Death Modellierbar, hier ist einfach die Länge der queue auf N beschränkt. Kommen costumer an, die Queue ist jedoch voll, werden diese verworfen. Wie Im Telefonnetz versuchen Costumer es dann zu einem Späteren Zeitpuntk erneut.
+		\subsubsection{M/M/m Queues}
+			Wie im Titel schon zu sehen, handelt es sich hier um M/M Queues auf m (oder auch n) Systemen. Idelt ein Server, bekommt dieser direkt eine neue Anfrage, sind alle Server beschäftigt, müssen Anfragen warten. M/M/m Queues können weiterhin mit Birth-Death modelliert werden. Die Koefizienten sind
+			$$
+				\lambda_k = \lambda
+			$$
+			$$
+				\mu_k = min(k\mu,m\mu) 
+			$$
+			wobei
+			$$
+				k\mu \forall 0\le k \le m
+			$$
+			$$
+				m\mu \forall m \le k 
+			$$
+			Due State Machine sieht wie folgt aus:
+			\begin{center}
+				\begin{tikzpicture}[auto]
+					\node[state] (q0) {$0$};            
+					\node[state, right=of q0] (q1) {$1$};        
+					\node[state, right=of q1] (q2) {$2$};       
+					\node[state, right=of q2] (q3) {$3$};                           
+					\draw 
+						(q0) edge[->, loop above] node {} ()    
+							edge[->, bend left] node {$\lambda$} (q1)             
+						(q1) edge[->, loop above] node {} ()  
+							edge[->, bend left] node {$\mu$} (q0)  
+							edge[->, bend left] node {$\lambda$} (q2)   
+						(q2) edge[->, loop above] node {} () 
+							edge[->, bend left] node {$2\mu$} (q1)
+							edge[->, bend left] node {$\lambda$} (q3)
+						(q3) edge[->, loop above] node {} () 
+							edge[->, bend left] node {$3\mu$} (q2);
+				\end{tikzpicture}
+			\end{center} 
+			Die probability of Queueing $\delta$ ist
+			$$
+				\delta = P[Queueing] = p_0\frac{(m\rho)^m}{m!(1-\rho)}
+			$$
+			Die durchschnittliche Number of Costumers ist 
+			$$
+				\overline{N}= m\rho + \frac{\rho \delta }{1-\rho}
+			$$
+			Mit Little's Law ist die durchschnittliche Zeit im System
+			$$
+				T=\frac{1}{\mu}\left(1+\frac{\delta}{m(1-\rho)}\right)
+			$$
+
+	Andere Beispiele für Queues mit mehr als 1 Systemen auf 5:44-5:49

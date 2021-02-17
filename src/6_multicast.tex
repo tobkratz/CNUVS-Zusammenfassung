@@ -1,0 +1,95 @@
+\section{Multicast}
+    Bisher haben wir mit folgenden Modellen gearbeitet:
+    \begin{itemize}
+        \item Unicast
+            \begin{itemize}
+                \item Ein Sender und ein Empfänger
+            \end{itemize}
+        \item Broadcast
+            \begin{itemize}
+                \item Ein Sender, alle anderen Netzwerkteilnehmer Empfangen. 
+            \end{itemize}
+    \end{itemize}
+
+    Multicast hingegen ist eine Lösung, Daten an mehrere Empfänger zu verschicken, ohne Traffic mehrmals zu versenden. Packete werden dann an definierte Multicast Gruppen versendet. 
+    
+    \subsection{Implementing Multicast}
+        \paragraph{Multicast via unicast}
+            Ein Sender sendet hierbei je Empfänger ein Packet konkret an den Empfänger. Der Host sendet also für N Empfänger N Packete. Hierbei fallen die Vorteile von veringerung des Traffics weg. Das Packet wird direkt beim Sender dupliziert.
+
+        \paragraph{Network Multicast}
+            Ein Host sendet hierbei nur ein Packet ins Netz, das von Routern dupliziert wird, falls dieses an verschiedene Routen weitergeleitet werden soll.
+
+        \paragraph{Application-Layer multicast}
+            Packete werden hier beim Host im Application Layer dupliziert. Dieser sendet die Packete dann erneut durch das Netzwerk an andere Empfänger. 
+
+    \subsection{IP Multiplexing}
+        Die wohl beste und weit verbreiteste Lösung ist die Implementierung des IP Multiplexing. Es gibt definierte IP Blöcke, die für Multicast vorgesehen sind. Host können einer Gruppe (= eine Addresse) beliebig beitreten oder diese verlassen. Host speichern dabei keine Liste 
+        In IPv4 sind die Addressen 224.0.0.0-239.255.255.255 für Multicast reserviert, wobei 224.0.0.0/24 für Multicast Routing und Group Management gedacht sind. Die Addressen können nur als Destination genutzt werden und für Multicast datagrams können keine ICMP error messages generiert werden. \\
+        In IPv6 sind die Addressen FF00::/8 für Multicast reserviert. Nach den ersten 8 Bit sind die 4 weitern Bits für falgs reserviert, z.B. well known oder transient. Die nächsten 4 Bits (13-16)  sind für den scope reserviert, z.B. loopback (1), link-local, site-local (5) oder global (E). \\
+        Um Multicast zum Ziel zu bringen, müssen Routern multicast routing protokolle sprechen, um delivery trees zu bauen und packete weiterleiten zu können. Außerdem muss ein Router ein Group membership protocol (IGMP) sprechen, um zu welchen, ob Geräte ''seines'' Netzwerks in multicast Gruppen sind. 
+
+        \paragraph{Joining a multicast Group}
+            Der Host informiert via IGMP den Router, dass er gruppe jounen will. Zwischen Routern gibt es andere Protokolle, z.B. DVMRP, MOSPF oder PIM. 
+        
+        \subsubsection{IGMP}
+            Will eine Application einer Multicast Gruppe beitreten, sendet Host eine IP\_ADD\_MEMBERSHIP request. Das ganze ist ein soft state, das heißt, das der Host nicht explizit leaven muss. Ein router leitet Packete via boradcast in ''sein'' subnet weiter und alle Host die Teil dieser Gruppe sind, müssen regelmäßig replien. 
+ 
+    \subsection{Multicast Routing}
+        Um den Tranfer des Packets vom Sender zum Router zu organisieren, gibt es verschiedene Algorithmen oder Methoden. Das Ziel ist es, einen Tree mit Routen zu bauen, dabei wird jedoch entschieden Zwischen 
+        \begin{itemize}
+            \item Shared-tree (alle Hosts nutzen den gleichen Tree)
+                \begin{itemize}
+                    \item Group Shared Trees (Jede Gruppe nutzt ein Tree)
+                        \begin{itemize}
+                            \item Minimal Spanning Tree (MST)
+                            \item Core based trees (CBT)
+                        \end{itemize}
+                \end{itemize}
+            \item und Source-Based Tree (Ein Baum von jedem Sender zu jedem Empfänger)
+                \begin{itemize}
+                    \item Shortest path trees (SPT)
+                    \item Reverse path forwarding (RPF)
+                \end{itemize}
+        \end{itemize}
+
+        \paragraph{Flooding}
+            Statt der nutzung von dedizierten Algorithmen kann ein Router auch per flooding Packete an andere Router weiterleiten, es muss sich allerdings merken, welche Packete er schon weitergeleitet hat, sonst kommt es zu einem flodding storm. Es wird also viel Leistung benötigt, um den state zu dokumentieren. Außerdem wird traffic sehr ineffizient genutzt, da Router auch Packete bekommen, die sich intern nicht weiterleiten. 
+        
+        \subsubsection{Spanning Trees}
+            Das Ziel ist es, einen Graphen zu bauen, der zwei Host nur über einen Pfad verbindet, um so loops zu verhindern. 
+
+            \paragraph{Steiner Trees}
+                Bei Steiner Trees wird aus einem (Netzwerk-) Graphen G=(B,E,cost) und terminals $S\subseteq V$ ein Graph $T\subseteq G$ über S mit den leichtesten Pfaden gebaut. Da jedoch Informtionen über die Netzwerk Topoligie sowie viel rechenleistung je Änderung (z.B Ausfall oder hinzufügen eines Routers) benötigt wird, ist diese Methode nicht im Internet vertreten. 
+            
+            \paragraph{Shorstest Path Tree}
+                Hier wird in einem gewichteten Graphen mit Dijkstras der kürzeste Pfad zu jedem Host mit einem Group Member gesucht. Durch link state Routing kann Dijkstras Informtionen zur Topoligiebekommen. 
+
+            \paragraph{Reverse Path Forwarding}
+                Wenn ein Packet von einem Host über einen Pfad kommt, von dem der Router weiß, dass es der kürzeste Pfad ist, sendet er das Packet per Flooding an alle outgoing links weiter. Ein Beispiel ist auf 6:29. Eine weiterentwicklung wäre, Prune Nachricht zu schicken, damit Subtrees die nicht Teil der Gruppe sind, keine unnötigen Packete per flooding bekommen.
+
+        \subsubsection{Multicast Routing Protocols}
+            \paragraph{Distance vector multicast routing protocol (DVMRP)}
+                Mit RFC1075 eingeführt, Flood and prune: RPF source-based trees. Keine Annahme von underlay unicast Verbindungen. 
+            
+            \paragraph{Protocol Independent Multicast}
+                PIM lässt sich in 2 arten implementieren:
+                \begin{itemize}
+                    \item MODE 1: Dense Mode (PIM-DM)
+                        \begin{itemize}
+                            \item Annahme dass Group Mitglieder sich nah beieinander befinden 
+                            \item Router sind explizit Mitglied einer Gruppe, außer sie prunen
+                            \item ''Data-driven construction of mcasttree''
+                        \end{itemize}
+                    \item MODE 2: Sparse Mode (PIM-SM)
+                        \begin{itemize}
+                            \item Annahme, dass Mitglieder weit verbreitet sind (z.B. über mehrere AS)
+                            \item explizites joinen
+                            \item erst wird ein geteilter core-based Tree erzeugt, der dann im laufenden Betrieb in einen Source Based Tree umgebaut wird. 
+                        \end{itemize}
+                \end{itemize}
+                Ein Konkreter Ablauf ist auf 6:33
+
+        \subsubsection{Reliable Multicast}
+            Für ein konkreten Usage in Multicast auf AS Ebene 6:35-6:39
+                

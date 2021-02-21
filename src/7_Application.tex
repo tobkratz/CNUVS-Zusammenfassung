@@ -1,0 +1,204 @@
+\section{Application Layer}
+	Application sind prinzipiell Distributed. Innerhalb eines Host kommunizieren Applications mit dem OS-Kernel, der die Kommunikation organisiert. So eine Inter Process Communication (IPC) kann auch über einen anderen Host laufen, dann kommen jedoch Faktoren wie Delay, Jitter oder Packet Lost wieder ins Spiel. Was ist/kann bei diesem Process Distributed (sein)?
+	\begin{itemize}
+		\item Data
+			\begin{itemize}
+				\item Ort der Daten gebunden an den Ort des Users, der Updates oder der Quelle der Daten
+				\item Aus administrationsgründen können Daten Distributed sein: central Access, database...
+			\end{itemize}
+		\item Computation
+			\begin{itemize}
+				\item Paralleles berechnen auf mehreren Hosts
+				\item Auf spezialisierter Hardware
+				\item Access zu restriktierten Daten
+			\end{itemize}
+		\item User
+			\begin{itemize}
+				\item Physische an verschiedenen Orten
+				\item User haben verschiedene Rollen
+			\end{itemize}
+	\end{itemize}
+
+	Wie auch auf anderen Layern gibt es beim A-Layer in RFC's deffinierte Protokolle, wie z.B. HTTPS, SFTP, SMTP. Diese beschreiben die z.B. Syntax und Semantik und sind für alle Quelloffen einsehbar. Es gibt jedoch auch proprietäre Protokolle, wie Skype oder MS Exchange, die nicht offen sind. 
+	\paragraph{Client-Server Model}
+		Während in den jungen Jahren des Internets noch eher mit P2P Modellen gearbeitet wurde, ist heute das Client-Server Modell verbreiteter. Hierbei stellen Clients Anfragen bei zentralen, öffentlich erreichbaren Server, die den Clients dann Antworten senden. Mit diesem Modell fällt die ehemals starke dezentralität weg. Bei diesem Modell gibt es zwei Arten:
+		\begin{itemize}
+			\item Iterative Server
+				\begin{itemize}
+					\item Der Server (A-Layer) handelt nur eine Anfrage gleichzeitig.
+					\item Kommen mehrere Anfragen, werden diese vom OS gequeued und nacheinander der Application serviert.
+				\end{itemize}
+			\item Concurrent Servers
+				\begin{itemize}
+					\item Die Hauptaufgabe ist es, Anfragen anzunehmen
+					\item Sobald eine Anfrage ankommt, wird ein Child-Process erschaffen, dessen Aufgabe es ist, die Anfrage zu beantworten
+					\item Der Main-Process kann in der Zeit, in der der Child-Process die Anfrage bearbeitet, neue Anfragen annehmen und zu jeder einen neuene Child-Process erschaffen
+					\item Hat der Child-Process die Anfrage bearbeitet und geantwortet, terminiert er
+				\end{itemize}
+		\end{itemize}
+
+	\subsection{Socket Programming}
+		Ein Modell zur Socket Programmierung ist die Berkeley Socket API, die es ermöglicht, Distributed Systems auf dem Application Layer zu implementieren. Die API wurde dabei hauptsächlich für UNIX Systeme entwickelt und wird dort eingesetzt. Die Socket API befindet sich zwischen Application protocols und transport:
+		\begin{table}[ht]
+			\centering
+			\begin{tabular}{|l|}
+			\hline
+			Application           \\ \hline
+			Application protocols \\ \hline \hline
+			Transport             \\ \hline
+			Internet Protocol     \\ \hline
+			Network Interface     \\ \hline
+			\end{tabular}
+		\end{table}
+		Ein Socket ist dabei die Kombination aus IP und Port. Eine Connection wird dabei immer als Socket Paar (local/remote) identifiziert, wie schon im T-Layer beschrieben. Beispiel Socket Calls sind auf 7:14-7:16.
+		Ein Prozess fragt dabei einen Socket beim OS an. der Port ist dabei meistens ein unpreviligierter, also größer 1024. Eine implementierung eines Python Echo Servers ist auf 7:17-7:19, eine Java Beispiel auf 7:20-7:28.
+	\subsection{DNS}
+		Wie schon erwähnt, werden Host mit Addressen angesteuert (32 Bit für IPv4, 128 für IPv6), doch möchte ein Menschlicher User einen Server erreichen, möchte er etwas leichter merkbares verwenden, eine domain aka. ''Name''. Ähnlich wie mit Telefon, braucht es dafür eine Art ''Telefonbuch''.\\
+		Im Internet werden Namen Hierarchich organisiert. Die wurzel aka. ''root zone'' bildet dabei ''.'', von der sich weiter Zonen sog. Top-Level-Domains abspalten, e.g. ''.edu, .org, .com...''. Diese können dann weiter deligiert werden. Es gibt einige wenige Root Server, die ihre IP Addressen per anycast teilen. Diesen sind die die Name-Server für die verschiedenen TLDs bekannt, in denen dann wieder Zone weiter deligiert werden. TLDs werden von verschiedenen Authoritäten maintained, denic z.B. ''.de.'', Educause ''.edu.''. \\
+		Um die Last zu verteilen, lassen sich auch mehrere Domain-Server parallel bereiben (primary/secondary). \\
+
+		\paragraph{Chaching and Resolver}
+			Damit nicht für jede Anfrage ein Domain Server höherer Hierarchie angefragt werden muss, können auch rekursive Chaching Server lokal betrieben werden. Diese sind der default Server für Geräte in lokalen Netzen und speichern aufgelöste Addressen für eine gewisse Zeit. Der Resolver ist dabei die Software auf den Hosts der Clients, die den Nameserver nach Addressen anfragen. Eine Nachricht hat dabei den folgenden Aufbau: 
+			\begin{table}[ht]
+				\centering
+				\begin{tabular}{|c|c|c|c|c|c|c|c|}
+				\hline
+				4            & 8          & 12          & 16          & 20        & 24        & 28        & 32       \\ \hline \hline
+				\multicolumn{4}{|c|}{Identification}                  & \multicolumn{4}{c|}{Flags and Codes}         \\ \hline
+				\multicolumn{4}{|c|}{Question Count}                  & \multicolumn{4}{c|}{Answer Record Count}     \\ \hline
+				\multicolumn{4}{|c|}{Name Server (Auth Record) Count} & \multicolumn{4}{c|}{Additional Record Count} \\ \hline
+				\multicolumn{8}{|c|}{Questions}                                                                      \\ \hline
+				\multicolumn{8}{|c|}{Answers}                                                                        \\ \hline
+				\multicolumn{8}{|c|}{Authority}                                                                      \\ \hline
+				\multicolumn{8}{|c|}{Additional Information}                                                         \\ \hline
+				\end{tabular}
+			\end{table}
+
+			Wobei 
+			\begin{table}[ht]
+				\centering
+				\begin{tabular}{llllllllllllllll}
+				16 &
+				17 &
+				18 &
+				19 &
+				20 &
+				21 &
+				22 &
+				23 &
+				24 &
+				25 &
+				26 &
+				27 &
+				28 &
+				29 &
+				30 &
+				31 \\ \hline 
+				\multicolumn{1}{|l|}{Q/R} &
+				\multicolumn{4}{l|}{OPCode} &
+				\multicolumn{1}{l|}{AA} &
+				\multicolumn{1}{l|}{TC} &
+				\multicolumn{1}{l|}{RD} &
+				\multicolumn{1}{l|}{RA} &
+				\multicolumn{3}{l|}{Zero} &
+				\multicolumn{4}{l|}{RespCode} \\ \hline
+				\end{tabular}
+			\end{table}
+			
+			Dabei ist 
+			\begin{itemize}
+				\item \textbf{Q/R} Query/Response Flag
+				\item \textbf{OPCode} Operation Code
+				\item \textbf{AA} Auth. Answer Flag 
+				\item \textbf{TC} Truncation Flag 
+				\item \textbf{RD} Recursion Desired Flag 
+				\item \textbf{RA} Recursion Available Flag 
+				\item \textbf{Zero} 3 reservierte Bits 
+				\item \textbf{Response Code} 
+			\end{itemize}
+
+			Die verschiedenen Header fields übernehmen dabei folgende Aufgaben:
+			\begin{itemize}
+				\item \textbf{Identifier} 16 Bit Feld. Der Sender generiert einen Code, der dann vom DNS Server in den Response Teil kopiert wird, damit der Sender verifizieren kann, dass die Antwort vom richtigen Server kam. 
+				\item \textbf{Query/Response Flag} 0=Oqery 1=Response 
+				\item \textbf{Operation Code} Nür für Querys. Spezifiziert den Typ der Nachricht. 
+				\item \textbf{Response Code} Success=1 ansonsten Fehler Code
+				\item \textbf{Authoritative Answer Flag (AA)} 1, wenn die Antwort Authoritative
+				\item \textbf{Truncation Flag} Wenn 1, dann wurde die Nachricht getrunct
+				\item \textbf{Recursion Desired} 1, wenn rekursiver Prozess gewünscht ist
+				\item \textbf{Recursion Available} 1, wenn rekursion möglich ist
+			\end{itemize}
+			Es gibt diverse DNS Records, die meist verwendeten sind z.B. A/AAAA für Hostname, der Wert ist dabei die IPv4/v6 Addresse. NS Record ist die IP Des Authoritative Name Servers. MX ist der Mailserver für diese Domain und CNAME ist ein Alias für einen anderen Record. 
+
+	\subsection{HTTP}
+		HTTP (Hypertext Transfer Protocol) ist ein Web Application Layer Protocol. Mit ihm können HTML, JPEG, Audio... Files übermittelt werden. HTTP 1.0 ist in RFC1945 festgehalten, HTTP2 in RFC7540 und wird inziwschen von fast 50\% aller Webservern gesprochen und wird von den meisten Browsern untersützt. HTTP läuft idr. auf 80/TCP und ist stateless, d.h. der Server speichert keine Informationen über den Client. Während HTTP1.0 noch mit nonpersistent HTTP gearbeitet hat, d.h. nur ein Objekt über TCP versendet hat, arbeitet HTTP1.1 mit persistent HTTP, d.h. mehrere Objekte können über eine TCP Verbindung gesendet werden. Ein Beispielablauf für eine non-persistant HTTP Session mit einer Seite mit einem HTML File, dass 10 JPEG Files referiert ist auf 7:50-7:51.
+		
+		\paragraph{Persistant vs. non-persistant HTTP} 
+			Während nonpersistent HTTP für jedes Objekt eine TCP Connection aufbaut, was 2RTTs pro Connection sind, und der Browser oft mehrere Connections parallel aufmacht, wird die Connection nach dem Senden der Response erstmal aufrecht erhalten. Persistant HTTP kann außerdem mit oder ohne Pipeline implementiert werden. Ohne pipelining werden neue request erst gesendet, wenn die Antwort der vorherigen Request angekommen ist. In HTTP1.1 ist jedoch Persistant mit pipelining default Einstellung. Hier wird eine request direkt beim auftreffen des Objekts erstellt. In HTTP2 wurde pipelining durch multiplexing abgelöst. 
+		
+		\paragraph{HTTP Messages}
+			Es gibt zwei Arten von HTTP Messages, request und Response. Die Response Message ist Human-readable in ASCII formartiert:
+			\begin{quote}
+				GET /somedir/page.html HTTP/1.1 \\
+				Host: www.someschool.edu\\
+				User-agent: Mozilla/4.0\\
+				Connection: close \\
+				Accept-language:fr
+			\end{quote}
+			und die Response Mesage:
+			\begin{quote}
+				HTTP/1.1 200 OK \\
+				Connection close \\
+				Date: Thu, 06 Aug 1998 12:00:15 GMT \\
+				Server: Apache/1.3.0 (Unix) \\
+				Last-Modified: Mon, 22 Jun 1998 ...... \\
+				Content-Length: 6821 \\
+				Content-Type: text/htmldata \\ \\
+				data data data data ...
+			\end{quote}
+
+		\paragraph{Method Types}
+			Um Anfragen an den Server zu stellen, kann z.B. die Post Method verwendet werden, dort werden Anfragen im entity Body übermittelt. Alternativ ist die URL Methode, dort werden mittels GET die Anfragen in die URL geschrieben. Das kann z.B. so aussehen: 
+			\begin{quote}
+				www.somesite.com/animalsearch?monkeys\&banana
+			\end{quote}
+			In HTTP1.0 gibt es die Mehtoden:
+			\begin{itemize}
+				\item GET
+				\item POST 
+				\item HEAD 
+					\begin{itemize}
+						\item Asks server to omit the requested object in its response →only the http header (html header) is sent
+					\end{itemize}
+			\end{itemize}
+			Neben diesen gibt es in HTTP1.1 \& HTTP2 noch
+			\begin{itemize}
+				\item PUT
+					\begin{itemize}
+						\item Upload eines Files in der URL angebenen Addresse
+					\end{itemize}
+				\item DELETE 
+					\begin{itemize}
+						\item Löschen des in der URL spezifizierten Files 
+					\end{itemize}
+			\end{itemize}
+
+		\paragraph{HTTP Response Cat} 
+			Es gibt diverse Status Codes für HTTP, die am häufigsten auftretenden sind z.B. 
+			\begin{itemize}
+				\item 200: OK 
+				\item 301: Moved Permanently 
+				\item 400: Bad Request 
+				\item 404: Not Found 
+				\item 505: HTTP Version not Supported 
+			\end{itemize}
+			Eine Liste mit Erklärung gibt es hier:
+			\begin{quote}
+				https://http.cat/
+			\end{quote}
+
+		\paragraph{Cookies}
+			Cookies werden verwendet, um den State eines Users zu speichern, beispielweise mit einem Session-Cookie. Damit lassen sich Dinge wie Warenkörbe, Logins... ermöglichen. Jedoch lassen sich Nutzer über Cookies tracken.
+	
+	\subsection{Peer 2 Peer}
+		Während das Internet mehr und mehr zentraler wird und Computation mehr auf weniger werdenden Server geschieht, setzen sich einige dafür ein, zum anarschistischen Kerngedanken eines dezentralen Internets zurück zu kehren. Eine möglichkeit dies zu implementieren sind peer2peer Verbindungen. Beispielsweise biem File Sharing angewendet wird eine Verbindung direkt zum anderen Host aufgebaut und Daten werden direkt ausgetauscht. Statt eines Zentralen Providers werden Files dort von mehreren anderen Hosts zusammengetragen. Andere Anwendungen bei denen Peer2Peer verwendet wird sind z.B. Blockchain, Video Streaming... 
